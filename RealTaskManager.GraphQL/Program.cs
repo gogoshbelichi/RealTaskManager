@@ -6,6 +6,8 @@ builder.Services.AddServiceConfigs(builder);
 
 builder.AddGraphQL().AddTypes()
     .AddGlobalObjectIdentification()
+    .AddDbContextCursorPagingProvider()
+    .AddPagingArguments()
     .AddMutationConventions();
 
 var app = builder.Build();

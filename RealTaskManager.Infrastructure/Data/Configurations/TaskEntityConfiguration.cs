@@ -16,7 +16,7 @@ public class TaskEntityConfiguration : IEntityTypeConfiguration<TaskEntity>
         builder.Property(t => t.CreatedAt).IsRequired();
         //builder.Property(t => t.CreatedBy).IsRequired();
         
-        builder
+        /*builder
             .HasOne(t => t.CreatedBy)
             .WithMany(u => u.CreatedTasks)
             .HasForeignKey(t => t.CreatedById)
@@ -26,6 +26,6 @@ public class TaskEntityConfiguration : IEntityTypeConfiguration<TaskEntity>
             .HasOne(t => t.AssignedTo)
             .WithMany(u => u.AssignedTasks)
             .HasForeignKey(t => t.AssignedToId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.SetNull);*/
     }
 }
