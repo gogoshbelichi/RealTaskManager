@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.GraphQL.Configurations;
 using RealTaskManager.GraphQL.Extensions;
+using RealTaskManager.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,18 +96,32 @@ app.MapPost("/custom-login", async (
     if (!await userManager.CheckPasswordAsync(user, request.Password))
         return Results.Unauthorized();
     var userRoles = await userManager.GetRolesAsync(user);
-    var access_token = generator.GenerateToken(request.Email, userRoles);
+    var userId = user.Id;
+    var access_token = generator.GenerateToken(request.Email, userId, userRoles);
     return Results.Ok(access_token);
 });
 
 app.MapPost("/custom-register", async (
     UserManager<TaskManagerUser> userManager,
+    RealTaskManagerDbContext dbContext,
     RegisterRequest request, string username) =>
 {
     var user = new TaskManagerUser { Email = request.Email,  UserName = username };
     var result = await userManager.CreateAsync(user, request.Password);
+    if (!result.Succeeded)
+    {
+        return Results.BadRequest($"Registration failed {result.Errors}");
+    }
 
-    return result.Succeeded ? Results.Created() : Results.BadRequest("Registration failed");
+    var userEntity = new UserEntity
+    {
+        IdentityId = user.Id
+    };
+    
+    await dbContext.Users.AddAsync(userEntity);
+    await dbContext.SaveChangesAsync();
+    
+    return Results.Created();
 });
 
 app.MapPost("/add-role", async (
@@ -116,7 +131,7 @@ app.MapPost("/add-role", async (
     if (await roleManager.RoleExistsAsync(role)) return Results.Conflict("Role already exists");
     var result = await roleManager.CreateAsync(new IdentityRole(role));
     return result.Succeeded ? Results.Created() : Results.BadRequest("Role not created");
-});
+}).RequireAuthorization("AdminPolicy");
 
 app.MapPatch("/assign-role", async (
     string role,
@@ -129,8 +144,8 @@ app.MapPatch("/assign-role", async (
     if (user is null) return Results.BadRequest("User not found");
     var result = await userManager.AddToRoleAsync(user, role);
     return result.Succeeded ? Results.Accepted() : Results.BadRequest("Role not added");
-});
+}).RequireAuthorization();
 
-app.MapGet("/weather", () => "The weather is nice").RequireAuthorization("AdminPolicy");
+app.MapGet("/weather", () => "The weather is nice").RequireAuthorization("UserPolicy");
 
 app.RunWithGraphQLCommands(args);

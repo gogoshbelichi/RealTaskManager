@@ -20,3 +20,5 @@ public record UpdateTaskInput(
 );
 
 public record TakeTaskInput([property: ID<TaskEntity>] Guid Id );
+
+public record DeleteTaskInput([property: ID<TaskEntity>] Guid Id);

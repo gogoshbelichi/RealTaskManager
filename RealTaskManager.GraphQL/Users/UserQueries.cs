@@ -16,9 +16,10 @@ public static class UserQueries
     [UseSorting]
     public static IQueryable<UserEntity> GetUsers(RealTaskManagerDbContext dbContext)
     {
-        return dbContext.Users.AsNoTracking().OrderBy(t => t.Username).ThenBy(t => t.Id);
+        return dbContext.Users.AsNoTracking().OrderBy(t => t.Id).ThenBy(t => t.IdentityId);
     }
     
+    [Authorize("AdminPolicy")]
     [NodeResolver]
     public static async Task<UserEntity?> GetUserByIdAsync(
         Guid id,
@@ -29,6 +30,7 @@ public static class UserQueries
         return await userById.Select(selection).LoadAsync(id, cancellationToken);
     }
     
+    [Authorize("AdminPolicy")]
     public static async Task<IEnumerable<UserEntity?>> GetUsersByIdAsync(
         [ID<UserEntity>] Guid[] ids,
         IUserByIdDataLoader userById,

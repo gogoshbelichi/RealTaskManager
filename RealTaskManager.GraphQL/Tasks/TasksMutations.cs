@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using HotChocolate.Authorization;
+using Microsoft.EntityFrameworkCore;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.Infrastructure.Data;
 
@@ -20,9 +22,11 @@ public static class TasksMutations
         {
             Title = input.Title,
             Description = input.Description,
-            Status = input.Status ?? TaskStatusEnum.Backlog
+            Status = input.Status ?? TaskStatusEnum.Backlog,
         };
 
+        
+        
         await dbContext.Tasks.AddAsync(task, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -31,9 +35,10 @@ public static class TasksMutations
     }
     
     [Authorize]
-    [Error<TitleEmptyException>]
+    [Error<TaskNotFoundException>]
     public static async Task<TaskEntity> UpdateTaskAsync(
         UpdateTaskInput input,
+        ClaimsPrincipal claimsPrincipal,
         RealTaskManagerDbContext dbContext,
         CancellationToken cancellationToken)
     {
@@ -48,15 +53,25 @@ public static class TasksMutations
         task.Description = input.Description ?? task.Description;
         task.Status = input.Status ?? task.Status;
 
+        if (claimsPrincipal is null)
+        {
+            throw new UserNotFoundException();
+        }
+        
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.IdentityId == claimsPrincipal
+            .FindFirstValue(ClaimTypes.NameIdentifier), cancellationToken) ?? throw new UserNotFoundException();
+        
+        user.TasksCreatedByUser.Add(new TasksCreatedByUser(){ Task = task, User = user});
+        
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return task;
     }
-    
+
     [Authorize]
-    [Error<TitleEmptyException>]
-    public static async Task<TaskEntity> TakeTaskAsync(
-        TakeTaskInput input,
+    [Error<TaskNotFoundException>]
+    public static async Task<DeleteTaskPayload> DeleteTaskAsync(
+        DeleteTaskInput input,
         RealTaskManagerDbContext dbContext,
         CancellationToken cancellationToken)
     {
@@ -66,14 +81,36 @@ public static class TasksMutations
         {
             throw new TaskNotFoundException();
         }
+        
+        dbContext.Tasks.Remove(task);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        var user = new UserEntity
+        return new DeleteTaskPayload("Deleted");
+    }
+    
+    [Authorize]
+    [Error<TaskNotFoundException>]
+    public static async Task<TaskEntity> TakeTaskAsync(
+        TakeTaskInput input,
+        RealTaskManagerDbContext dbContext,
+        ClaimsPrincipal?  claimsPrincipal,
+        CancellationToken cancellationToken)
+    {
+        var task = await dbContext.Tasks.FindAsync([input.Id], cancellationToken);
+
+        if (task is null)
         {
-            Username = "gogosh",
-            Email = "gogosh@ex.com",
-            
-            
-        };
+            throw new TaskNotFoundException();
+        }
+
+        if (claimsPrincipal is null)
+        {
+            throw new UserNotFoundException();
+        }
+        
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.IdentityId == claimsPrincipal
+            .FindFirstValue(ClaimTypes.NameIdentifier), cancellationToken) ?? throw new UserNotFoundException();
+        
         task.TasksAssignedToUser.Add(new TasksAssignedToUser { Task = task, User = user});
         task.Status = TaskStatusEnum.InProgress;
 
