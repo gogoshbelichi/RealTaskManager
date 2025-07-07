@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>preview</LangVersion>
+        <UserSecretsId>541f6091-4778-4fd0-b617-9f758607fce2</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
@@ -13,27 +14,30 @@
 
     <ItemGroup>
         <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.6"/>
+        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.1.6" />
         <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="15.1.6"/>
         <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.6" />
+        <PackageReference Include="HotChocolate.Diagnostics" Version="15.1.6" />
         <PackageReference Include="HotChocolate.Types.Analyzers" Version="15.1.6">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.4" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Users\" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\RealTaskManager.Core\RealTaskManager.Core.csproj" />
       <ProjectReference Include="..\RealTaskManager.Infrastructure\RealTaskManager.Infrastructure.csproj" />
+      <ProjectReference Include="..\RealTaskManager.UseCases\RealTaskManager.UseCases.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 using GreenDonut.Data;
+using HotChocolate.Authorization;
 using HotChocolate.Execution.Processing;
 using Microsoft.EntityFrameworkCore;
 using RealTaskManager.Core.Entities;
@@ -9,8 +10,11 @@ namespace RealTaskManager.GraphQL.Tasks;
 [QueryType]
 public static class TaskQueries
 {
+    [Authorize]
     [UsePaging]
-    public static IQueryable<TaskEntity> GetTracks(RealTaskManagerDbContext dbContext)
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<TaskEntity> GetTasks(RealTaskManagerDbContext dbContext)
     {
         return dbContext.Tasks.AsNoTracking().OrderBy(t => t.Title).ThenBy(t => t.Id);
     }
@@ -18,7 +22,7 @@ public static class TaskQueries
     [NodeResolver]
     public static async Task<TaskEntity?> GetTaskByIdAsync(
         Guid id,
-        ITaskByTaskIdDataLoader taskById,
+        ITaskByIdDataLoader taskById,
         ISelection selection,
         CancellationToken cancellationToken)
     {
@@ -26,8 +30,8 @@ public static class TaskQueries
     }
     
     public static async Task<IEnumerable<TaskEntity?>> GetTasksByIdAsync(
-        Guid[] ids,
-        ITaskByTaskIdDataLoader taskById,
+        [ID<TaskEntity>] Guid[] ids,
+        ITaskByIdDataLoader taskById,
         ISelection selection,
         CancellationToken cancellationToken)
     {

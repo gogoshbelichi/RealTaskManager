@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTaskManager.Core", "Rea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTaskManager.Infrastructure", "RealTaskManager.Infrastructure\RealTaskManager.Infrastructure.csproj", "{6775396B-8455-46D5-9843-48AC804AD0DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTaskManager.UseCases", "RealTaskManager.UseCases\RealTaskManager.UseCases.csproj", "{05215FEF-2C2A-4E57-BE5B-ACEDA2D885C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{6775396B-8455-46D5-9843-48AC804AD0DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6775396B-8455-46D5-9843-48AC804AD0DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6775396B-8455-46D5-9843-48AC804AD0DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05215FEF-2C2A-4E57-BE5B-ACEDA2D885C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05215FEF-2C2A-4E57-BE5B-ACEDA2D885C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05215FEF-2C2A-4E57-BE5B-ACEDA2D885C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05215FEF-2C2A-4E57-BE5B-ACEDA2D885C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

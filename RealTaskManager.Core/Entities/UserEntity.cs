@@ -4,9 +4,10 @@ namespace RealTaskManager.Core.Entities;
 public sealed class UserEntity
 {
     public Guid Id { get; private set; }
-    public string Username { get; private set; } = string.Empty;
-    public string Email { get; private set; } = string.Empty;
-    public string IdentityId { get; private set; } = string.Empty;
+    public string Username { get; init; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+    public string PasswordHash { get; init; } = string.Empty; 
+    public string IdentityId { get; init; } = string.Empty;
     
     public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; init; } = [];
     public ICollection<TasksCreatedByUser> TasksCreatedByUser { get; init; } = [];

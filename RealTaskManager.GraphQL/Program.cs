@@ -79,7 +79,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
