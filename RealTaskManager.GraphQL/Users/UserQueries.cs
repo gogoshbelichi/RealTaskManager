@@ -31,7 +31,7 @@ public static class UserQueries
     }
     
     [Authorize("AdminPolicy")]
-    public static async Task<IEnumerable<UserEntity?>> GetUsersByIdAsync(
+    public static async Task<IEnumerable<UserEntity>> GetUsersByIdAsync(
         [ID<UserEntity>] Guid[] ids,
         IUserByIdDataLoader userById,
         ISelection selection,

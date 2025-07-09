@@ -72,6 +72,7 @@ public static class TasksMutations
     [Error<TaskNotFoundException>]
     public static async Task<DeleteTaskPayload> DeleteTaskAsync(
         DeleteTaskInput input,
+        ClaimsPrincipal claimsPrincipal,
         RealTaskManagerDbContext dbContext,
         CancellationToken cancellationToken)
     {
@@ -82,10 +83,27 @@ public static class TasksMutations
             throw new TaskNotFoundException();
         }
         
-        dbContext.Tasks.Remove(task);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        if (claimsPrincipal is null)
+        {
+            throw new UserNotFoundException();
+        }
+        
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.IdentityId == claimsPrincipal
+            .FindFirstValue(ClaimTypes.NameIdentifier), cancellationToken) ?? throw new UserNotFoundException();
 
-        return new DeleteTaskPayload("Deleted");
+        var taskIdByUserAndTaskId = task.TasksCreatedByUser
+            .Where(t => t.TaskId == task.Id && t.UserId == user.Id)
+            .Select(t => t.Task.Id).FirstOrDefault();
+
+
+        if (claimsPrincipal.IsInRole("Administrator") || (!claimsPrincipal.IsInRole("Administrator") && task.Id == taskIdByUserAndTaskId))
+        {
+            dbContext.Tasks.Remove(task);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return new DeleteTaskPayload("The task has been deleted");
+        }
+        return new DeleteTaskPayload("The task is not deleted");
     }
     
     [Authorize]

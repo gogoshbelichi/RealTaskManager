@@ -16,25 +16,3 @@ public sealed class TaskEntity
     public ICollection<TasksCreatedByUser> TasksCreatedByUser { get; init; } = [];
 }
 
-/*public class TaskStatusModel
-{
-    public Guid Id { get; init; }
-    public string Status { get; protected set; }
-    public ICollection<TaskEntity> Tasks { get; set; } = [];
-}
-
-public sealed class TaskStatusTodo : TaskStatusModel
-{
-    public TaskStatusTodo() => Status  = "To do";
-} 
-
-public sealed class TaskStatusInProgress : TaskStatusModel
-{
-    public TaskStatusInProgress() => Status = "In Progress";
-} 
-
-public sealed class TaskStatusDone : TaskStatusModel
-{
-    public TaskStatusDone() => Status = "Done";
-} */
-

@@ -19,6 +19,7 @@ public static class TaskQueries
         return dbContext.Tasks.AsNoTracking().OrderBy(t => t.Title).ThenBy(t => t.Id);
     }
     
+    [Authorize]
     [NodeResolver]
     public static async Task<TaskEntity?> GetTaskByIdAsync(
         Guid id,
@@ -29,7 +30,8 @@ public static class TaskQueries
         return await taskById.Select(selection).LoadAsync(id, cancellationToken);
     }
     
-    public static async Task<IEnumerable<TaskEntity?>> GetTasksByIdAsync(
+    [Authorize]
+    public static async Task<IEnumerable<TaskEntity>> GetTasksByIdAsync(
         [ID<TaskEntity>] Guid[] ids,
         ITaskByIdDataLoader taskById,
         ISelection selection,

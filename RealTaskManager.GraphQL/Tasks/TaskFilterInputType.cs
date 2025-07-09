@@ -11,5 +11,6 @@ public sealed class TaskFilterInputType : FilterInputType<TaskEntity>
         
         descriptor.Field(s => s.Status);
         descriptor.Field(s => s.TasksAssignedToUser);
+        descriptor.Field(s => s.TasksCreatedByUser);
     }
 }

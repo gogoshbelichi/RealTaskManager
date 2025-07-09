@@ -9,7 +9,8 @@ public static partial class UserType
 { 
     static partial void Configure(IObjectTypeDescriptor<UserEntity> descriptor)
     {
-        descriptor.Authorize(new[] { "User", "Administrator" });
+        descriptor.Authorize("User", "Administrator");
+        descriptor.Field(u => u.IdentityId).Ignore();
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)
@@ -19,6 +20,7 @@ public static partial class UserType
                         .LoadAsync(id, ctx.RequestAborted));
     }
     
+    [UsePaging]
     [BindMember(nameof(UserEntity.TasksAssignedToUser))]
     public static async Task<IEnumerable<TaskEntity>> GetTasksAssignedToUserAsync(
         [Parent] UserEntity userEntity,
@@ -31,6 +33,7 @@ public static partial class UserType
             .LoadRequiredAsync(userEntity.Id, cancellationToken);
     }
     
+    [UsePaging]
     [BindMember(nameof(UserEntity.TasksCreatedByUser))]
     public static async Task<IEnumerable<TaskEntity>> GetTasksCreatedByUserAsync(
         [Parent] UserEntity userEntity,

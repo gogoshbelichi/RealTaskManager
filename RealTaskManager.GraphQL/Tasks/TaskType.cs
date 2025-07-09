@@ -1,5 +1,6 @@
 using GreenDonut.Data;
 using HotChocolate.Execution.Processing;
+using HotChocolate.Types.Pagination;
 using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.GraphQL.Tasks;
@@ -9,6 +10,7 @@ public static partial class TaskType
 {
     static partial void Configure(IObjectTypeDescriptor<TaskEntity> descriptor)
     {
+        descriptor.Authorize("User", "Administrator");
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)
@@ -18,27 +20,35 @@ public static partial class TaskType
                         .LoadAsync(id, ctx.RequestAborted));
     }
     
+    [UsePaging]
     [BindMember(nameof(TaskEntity.TasksAssignedToUser))]
-    public static async Task<IEnumerable<UserEntity>> GetUsersAssignedToTasksAsync(
-        [Parent] TaskEntity userEntity,
+    public static async Task<Connection<UserEntity>> GetUsersAssignedToTasksAsync(
+        [Parent(nameof(TaskEntity.Id))] TaskEntity userEntity,
         IUsersAssignedToTasksDataLoader userAssignedToTaskId,
+        PagingArguments pagingArguments,
         ISelection selection,
         CancellationToken cancellationToken)
     {
         return await userAssignedToTaskId
+            .With(pagingArguments)
             .Select(selection)
-            .LoadRequiredAsync(userEntity.Id, cancellationToken);
+            .LoadRequiredAsync(userEntity.Id, cancellationToken)
+            .ToConnectionAsync();
     }
     
+    [UsePaging]
     [BindMember(nameof(TaskEntity.TasksCreatedByUser))]
-    public static async Task<IEnumerable<UserEntity>> GetTasksCreatedByUserAsync(
-        [Parent] UserEntity userEntity,
+    public static async Task<Connection<UserEntity>> GetUsersCreatedTaskAsync(
+        [Parent(nameof(TaskEntity.Id))] TaskEntity taskEntity,
         IUsersCreatedTasksDataLoader tasksCreatedByUserId,
         ISelection selection,
+        PagingArguments pagingArguments,
         CancellationToken cancellationToken)
     {
         return await tasksCreatedByUserId
+            .With(pagingArguments)
             .Select(selection)
-            .LoadRequiredAsync(userEntity.Id, cancellationToken);
+            .LoadRequiredAsync(taskEntity.Id, cancellationToken)
+            .ToConnectionAsync();
     }
 }
