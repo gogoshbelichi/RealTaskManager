@@ -16,7 +16,7 @@ public static class UserQueries
     [UseSorting]
     public static IQueryable<UserEntity> GetUsers(RealTaskManagerDbContext dbContext)
     {
-        return dbContext.Users.AsNoTracking().OrderBy(t => t.Id).ThenBy(t => t.IdentityId);
+        return dbContext.Users.AsNoTracking().OrderBy(t => t.Id);
     }
     
     [Authorize("AdminPolicy")]

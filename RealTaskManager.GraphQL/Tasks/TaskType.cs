@@ -14,41 +14,34 @@ public static partial class TaskType
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)
-            .ResolveNode(
-                async (ctx, id)
-                    => await ctx.DataLoader<ITaskByIdDataLoader>()
-                        .LoadAsync(id, ctx.RequestAborted));
+            .ResolveNode(async (ctx, id)
+                => await ctx.DataLoader<ITaskByIdDataLoader>()
+                    .LoadAsync(id, ctx.RequestAborted));
     }
     
-    [UsePaging]
     [BindMember(nameof(TaskEntity.TasksAssignedToUser))]
-    public static async Task<Connection<UserEntity>> GetUsersAssignedToTasksAsync(
+    [GraphQLName("assignedTo")]
+    public static async Task<IEnumerable<UserEntity>> GetUsersAssignedToTasksAsync(
         [Parent(nameof(TaskEntity.Id))] TaskEntity userEntity,
         IUsersAssignedToTasksDataLoader userAssignedToTaskId,
-        PagingArguments pagingArguments,
         ISelection selection,
         CancellationToken cancellationToken)
     {
         return await userAssignedToTaskId
-            .With(pagingArguments)
             .Select(selection)
-            .LoadRequiredAsync(userEntity.Id, cancellationToken)
-            .ToConnectionAsync();
+            .LoadRequiredAsync(userEntity.Id, cancellationToken);
     }
     
-    [UsePaging]
     [BindMember(nameof(TaskEntity.TasksCreatedByUser))]
-    public static async Task<Connection<UserEntity>> GetUsersCreatedTaskAsync(
+    [GraphQLName("createdBy")]
+    public static async Task<IEnumerable<UserEntity>> GetUsersCreatedTaskAsync(
         [Parent(nameof(TaskEntity.Id))] TaskEntity taskEntity,
         IUsersCreatedTasksDataLoader tasksCreatedByUserId,
         ISelection selection,
-        PagingArguments pagingArguments,
         CancellationToken cancellationToken)
     {
         return await tasksCreatedByUserId
-            .With(pagingArguments)
             .Select(selection)
-            .LoadRequiredAsync(taskEntity.Id, cancellationToken)
-            .ToConnectionAsync();
+            .LoadRequiredAsync(taskEntity.Id, cancellationToken);
     }
 }

@@ -13,6 +13,7 @@ public static class TasksMutations
     [Error<TitleEmptyException>]
     public static async Task<TaskEntity> AddTaskAsync(
         AddTaskInput input,
+        ClaimsPrincipal claimsPrincipal,
         RealTaskManagerDbContext dbContext,
         CancellationToken cancellationToken)
     {
@@ -25,9 +26,12 @@ public static class TasksMutations
             Status = input.Status ?? TaskStatusEnum.Backlog,
         };
 
-        
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.IdentityId == claimsPrincipal
+            .FindFirstValue(ClaimTypes.NameIdentifier), cancellationToken) ?? throw new UserNotFoundException();
         
         await dbContext.Tasks.AddAsync(task, cancellationToken);
+        
+        task.TasksCreatedByUser.Add(new TasksCreatedByUser(){ Task = task, User = user});
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -61,7 +65,7 @@ public static class TasksMutations
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.IdentityId == claimsPrincipal
             .FindFirstValue(ClaimTypes.NameIdentifier), cancellationToken) ?? throw new UserNotFoundException();
         
-        user.TasksCreatedByUser.Add(new TasksCreatedByUser(){ Task = task, User = user});
+        user.TasksAssignedToUser.Add(new TasksAssignedToUser(){ Task = task, User = user});
         
         await dbContext.SaveChangesAsync(cancellationToken);
 

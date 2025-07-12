@@ -10,7 +10,31 @@ public sealed class TaskFilterInputType : FilterInputType<TaskEntity>
         descriptor.BindFieldsExplicitly();
         
         descriptor.Field(s => s.Status);
-        descriptor.Field(s => s.TasksAssignedToUser);
-        descriptor.Field(s => s.TasksCreatedByUser);
+        
+        descriptor.Field(s => s.TasksCreatedByUser)
+            .Type<TasksCreatedByUserFilterInputType>();
+        descriptor.Field(s => s.TasksAssignedToUser)
+            .Type<TasksAssignedToUserFilterInputType>();
+        
+    }
+}
+
+public sealed class TasksAssignedToUserFilterInputType : FilterInputType<TasksAssignedToUser>
+{
+    protected override void Configure(IFilterInputTypeDescriptor<TasksAssignedToUser> descriptor)
+    {
+        descriptor.BindFieldsExplicitly();
+
+        descriptor.Field(t => t.User);
+    }
+}
+
+public sealed class TasksCreatedByUserFilterInputType : FilterInputType<TasksCreatedByUser>
+{
+    protected override void Configure(IFilterInputTypeDescriptor<TasksCreatedByUser> descriptor)
+    {
+        descriptor.BindFieldsExplicitly();
+
+        descriptor.Field(t => t.User);
     }
 }

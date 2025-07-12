@@ -22,35 +22,30 @@ public static class TaskDataLoaders
     }
     
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, Page<UserEntity>>> UsersCreatedTasksAsync(
+    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersCreatedTasksAsync(
         IReadOnlyList<Guid> taskIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
-        PagingArguments pagingArguments,
         CancellationToken cancellationToken)
     {
-        return await dbContext.Users
+        return await dbContext.Tasks
             .AsNoTracking()
-            .OrderBy(s => s.Id)
-            .Select(s => s.TasksCreatedByUser
-                .Where(a => taskIds.Contains(a.TaskId) && a.TaskId != Guid.Empty), selector)
-            .ToBatchPageAsync(s => s.Id, pagingArguments, cancellationToken);
+            .Where(s => taskIds.Contains(s.Id))
+            .Select(s => s.Id, s => s.TasksCreatedByUser.Select(ss => ss.User), selector)
+            .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
     }
     
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, Page<UserEntity>>> UsersAssignedToTasksAsync(
+    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersAssignedToTasksAsync(
         IReadOnlyList<Guid> taskIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
-        PagingArguments pagingArguments,
         CancellationToken cancellationToken)
     {
-        return await dbContext.Users
+        return await dbContext.Tasks
             .AsNoTracking()
-            .OrderBy(s => s.Id)
             .Where(s => taskIds.Contains(s.Id))
-            .Select(s => s.TasksAssignedToUser
-                .Where(a => taskIds.Contains(a.TaskId) && a.TaskId != Guid.Empty), selector)
-            .ToBatchPageAsync(s => s.Id, pagingArguments, cancellationToken);
+            .Select(s => s.Id, s => s.TasksAssignedToUser.Select(ss => ss.User), selector)
+            .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
     }
 }
