@@ -23,25 +23,12 @@ public static partial class UserType
                     => await ctx.DataLoader<IUserByIdDataLoader>()
                         .LoadAsync(id, ctx.RequestAborted))
             .UseFiltering<UserFilterInputType>();
+        
+        descriptor.Field(u => u.Username);
+        
+        descriptor.Field(u => u.Email);
 
-        descriptor.Field("email").Resolve(ctx =>
-        {
-            var user = ctx.GetUser() ?? throw new UserNotFoundException();
-            return user.FindFirstValue(ClaimTypes.Email) ?? throw new UserNotFoundException();
-        });
-
-        descriptor.Field("roles").Resolve(ctx =>
-        {
-            var user = ctx.GetUser() ?? throw new UserNotFoundException();
-            // FindAll никогда не вернёт null, только пустой список.
-            return user.FindAll(ClaimTypes.Role).Select(r => r.Value);
-        });
-
-        descriptor.Field("username").Resolve(ctx =>
-        {
-            var user = ctx.GetUser() ?? throw new UserNotFoundException();
-            return user.FindFirstValue(JwtRegisteredClaimNames.PreferredUsername) ?? throw new UserNotFoundException();
-        });
+        descriptor.Field(u => u.Roles);
     }
     
     [BindMember(nameof(UserEntity.TasksCreatedByUser))]

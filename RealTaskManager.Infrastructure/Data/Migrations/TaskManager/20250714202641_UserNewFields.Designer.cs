@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RealTaskManager.Infrastructure.Data;
@@ -11,9 +12,11 @@ using RealTaskManager.Infrastructure.Data;
 namespace RealTaskManager.Infrastructure.Data.Migrations.TaskManager
 {
     [DbContext(typeof(RealTaskManagerDbContext))]
-    partial class RealTaskManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250714202641_UserNewFields")]
+    partial class UserNewFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,7 +50,7 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.TaskManager
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tasks", (string)null);
+                    b.ToTable("Tasks");
                 });
 
             modelBuilder.Entity("RealTaskManager.Core.Entities.TasksAssignedToUser", b =>
@@ -62,7 +65,7 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.TaskManager
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TasksAssignedToUsers", (string)null);
+                    b.ToTable("TasksAssignedToUsers");
                 });
 
             modelBuilder.Entity("RealTaskManager.Core.Entities.TasksCreatedByUser", b =>
@@ -77,7 +80,7 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.TaskManager
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TasksCreatedByUsers", (string)null);
+                    b.ToTable("TasksCreatedByUsers");
                 });
 
             modelBuilder.Entity("RealTaskManager.Core.Entities.UserEntity", b =>
@@ -110,7 +113,7 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.TaskManager
                     b.HasIndex("IdentityId")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("RealTaskManager.Core.Entities.TasksAssignedToUser", b =>

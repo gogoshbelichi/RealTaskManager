@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security;
 
 namespace RealTaskManager.Core.Entities;
 
@@ -8,7 +7,7 @@ public sealed class UserEntity
 {
     public Guid Id { get; init; }
     [MaxLength(254)] //RFC 5321 4.5.3.1 (254 to fit smtp)
-    public string Email { get; init; }
+    public required string Email { get; init; }
     [MaxLength(32)]
     public string? Username { get; init; }
     public ICollection<string> Roles { get; init; } = [];

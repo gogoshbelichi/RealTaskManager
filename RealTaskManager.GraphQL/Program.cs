@@ -12,7 +12,8 @@ builder.Configuration.AddUserSecrets<Program>();
 builder.Services.Configure<MagicOptions>(
     builder.Configuration.GetSection("MagicOptions"));
 
-builder.Services.AddSingleton<TokenGenerator>();
+builder.Services.AddScoped<CustomUserService>();
+builder.Services.AddScoped<TokenService>();
 var magicOptions = builder.Configuration.GetSection("MagicOptions").Get<MagicOptions>() ?? 
                    throw new ArgumentNullException("Something went wrong");
 builder.Services.AddAuthentication(authenticationOptions =>
