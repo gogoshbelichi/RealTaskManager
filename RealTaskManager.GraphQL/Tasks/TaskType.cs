@@ -17,6 +17,14 @@ public static partial class TaskType
             .ResolveNode(async (ctx, id)
                 => await ctx.DataLoader<ITaskByIdDataLoader>()
                     .LoadAsync(id, ctx.RequestAborted));
+
+        descriptor.Field(t => t.TasksCreatedByUser)
+            .ResolveWith<TaskResolvers>(r => r.GetUsersCreatedTasks(default!, default!))
+            .UseFiltering<TasksCreatedByUserFilterInputType>();
+        
+        descriptor.Field(t => t.TasksAssignedToUser)
+            .ResolveWith<TaskResolvers>(r => r.GetUsersAssignedToTasks(default!, default!))
+            .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
     [BindMember(nameof(TaskEntity.TasksAssignedToUser))]

@@ -15,4 +15,6 @@ public sealed class UserEntity
     public required string IdentityId { get; init; }
     public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; init; } = [];
     public ICollection<TasksCreatedByUser> TasksCreatedByUser { get; init; } = [];
+    
+    //public ICollection<TaskEntity> CretedTasks { get; init; } = []; //easier to do like this but what if we have a co-authors
 }

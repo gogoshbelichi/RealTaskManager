@@ -18,10 +18,9 @@ public static partial class UserType
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)
-            .ResolveNode(
-                async (ctx, id)
-                    => await ctx.DataLoader<IUserByIdDataLoader>()
-                        .LoadAsync(id, ctx.RequestAborted))
+            .ResolveNode(async (ctx, id)
+                => await ctx.DataLoader<IUserByIdDataLoader>()
+                    .LoadAsync(id, ctx.RequestAborted))
             .UseFiltering<UserFilterInputType>();
         
         descriptor.Field(u => u.Username);
@@ -29,6 +28,14 @@ public static partial class UserType
         descriptor.Field(u => u.Email);
 
         descriptor.Field(u => u.Roles);
+        
+        descriptor.Field(t => t.TasksCreatedByUser)
+            .ResolveWith<TaskResolvers>(r => r.GetTasksCreatedByUsers(default!, default!))
+            .UseFiltering<TasksCreatedByUserFilterInputType>();
+        
+        descriptor.Field(t => t.TasksAssignedToUser)
+            .ResolveWith<TaskResolvers>(r => r.GetTasksAssignedToUsers(default!, default!))
+            .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
     [BindMember(nameof(UserEntity.TasksCreatedByUser))]
