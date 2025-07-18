@@ -50,8 +50,10 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddServiceConfigs(builder);
 
-builder.AddGraphQL().AddTypes()
+builder.AddGraphQL()
+    .AddMaxExecutionDepthRule(5).AddTypes()
     .AddGlobalObjectIdentification()
+    .AddQueryContext()
     .AddDbContextCursorPagingProvider()
     .AddPagingArguments()
     .AddFiltering()

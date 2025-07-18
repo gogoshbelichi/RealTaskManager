@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.Infrastructure.Data;
 
@@ -5,35 +6,39 @@ namespace RealTaskManager.GraphQL.Tasks;
 
 public sealed class TaskResolvers
 {
-    public IQueryable<UserEntity> GetUsersCreatedTasks(
+    public IQueryable<TasksCreatedByUser> GetTasksCreatedByUserObjects(
         [Parent] TaskEntity taskEntity,
         RealTaskManagerDbContext dbContext)
     {
-        return dbContext.TasksCreatedByUsers.Where(tcu => tcu.TaskId == taskEntity.Id)
-            .Select(tcu => tcu.User);
+        return dbContext.TasksCreatedByUsers
+            .Where(tcu => tcu.TaskId == taskEntity.Id)
+            .Include(tcu => tcu.User);
     }
     
-    public IQueryable<UserEntity> GetUsersAssignedToTasks(
+    public IQueryable<TasksAssignedToUser> GetTasksAssignedToUserObjects(
         [Parent] TaskEntity taskEntity,
         RealTaskManagerDbContext dbContext)
     {
-        return dbContext.TasksAssignedToUsers.Where(tcu => tcu.TaskId == taskEntity.Id)
-            .Select(tcu => tcu.User);
+        return dbContext.TasksAssignedToUsers
+            .Where(tcu => tcu.TaskId == taskEntity.Id)
+            .Include(tcu => tcu.User);
     }
     
-    public IQueryable<TaskEntity> GetTasksCreatedByUsers(
+    public IQueryable<TasksCreatedByUser> GetTasksCreatedByUserObjectsForUser(
         [Parent] UserEntity userEntity,
         RealTaskManagerDbContext dbContext)
     {
-        return dbContext.TasksCreatedByUsers.Where(tcu => tcu.UserId == userEntity.Id)
-            .Select(tcu => tcu.Task);
+        return dbContext.TasksCreatedByUsers
+            .Where(tcu => tcu.UserId == userEntity.Id)
+            .Include(tcu => tcu.Task);
     }
     
-    public IQueryable<TaskEntity> GetTasksAssignedToUsers(
+    public IQueryable<TasksAssignedToUser> GetTasksAssignedToUserObjectsForUser(
         [Parent] UserEntity userEntity,
         RealTaskManagerDbContext dbContext)
     {
-        return dbContext.TasksAssignedToUsers.Where(tcu => tcu.UserId == userEntity.Id)
-            .Select(tcu => tcu.Task);
+        return dbContext.TasksAssignedToUsers
+            .Where(tcu => tcu.UserId == userEntity.Id)
+            .Include(tcu => tcu.Task);
     }
 }

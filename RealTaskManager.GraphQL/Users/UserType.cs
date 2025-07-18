@@ -20,21 +20,26 @@ public static partial class UserType
             .IdField(a => a.Id)
             .ResolveNode(async (ctx, id)
                 => await ctx.DataLoader<IUserByIdDataLoader>()
-                    .LoadAsync(id, ctx.RequestAborted))
-            .UseFiltering<UserFilterInputType>();
+                    .LoadAsync(id, ctx.RequestAborted));
         
         descriptor.Field(u => u.Username);
         
         descriptor.Field(u => u.Email);
 
         descriptor.Field(u => u.Roles);
+
+        descriptor.Field(u => u.NumberCreatedTasks);
         
+        descriptor.Field(u => u.NumberAssingnedTasks);
+
         descriptor.Field(t => t.TasksCreatedByUser)
-            .ResolveWith<TaskResolvers>(r => r.GetTasksCreatedByUsers(default!, default!))
+            .ResolveWith<TaskResolvers>(r =>
+                r.GetTasksCreatedByUserObjectsForUser(default!, default!))
             .UseFiltering<TasksCreatedByUserFilterInputType>();
-        
+
         descriptor.Field(t => t.TasksAssignedToUser)
-            .ResolveWith<TaskResolvers>(r => r.GetTasksAssignedToUsers(default!, default!))
+            .ResolveWith<TaskResolvers>(r =>
+                r.GetTasksAssignedToUserObjectsForUser(default!, default!))
             .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
@@ -46,6 +51,7 @@ public static partial class UserType
         ISelection selection,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine("UserType GetTasksCreatedByUserAsync");
         return await tasksCreatedByUserId
             .Select(selection)
             .LoadRequiredAsync(userEntity.Id, cancellationToken);
@@ -59,6 +65,7 @@ public static partial class UserType
         ISelection selection,
         CancellationToken ct)
     {
+        Console.WriteLine("UserType GetTasksAssignedToUserAsync");
         return await loader
             .Select(selection)
             .LoadRequiredAsync(user.Id, ct);

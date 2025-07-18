@@ -12,7 +12,7 @@ public static class TaskQueries
 {
     [Authorize]
     [UsePaging]
-    [UseFiltering]
+    [UseFiltering(typeof(TaskFilterInputType))]
     [UseSorting]
     public static IQueryable<TaskEntity> GetTasks(RealTaskManagerDbContext dbContext)
     {

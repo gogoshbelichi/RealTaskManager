@@ -14,6 +14,7 @@ public class UserDataLoaders
         ISelectorBuilder selector,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine("Dataloader UserByIdAsync");
         return await dbContext.Users
             .AsNoTracking()
             .Where(a => ids.Contains(a.Id))
@@ -28,6 +29,7 @@ public class UserDataLoaders
         ISelectorBuilder selector,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine("Dataloader TasksCreatedByUserAsync");
         return await dbContext.Users
             .AsNoTracking()
             .Where(s => userIds.Contains(s.Id))
@@ -42,6 +44,7 @@ public class UserDataLoaders
         ISelectorBuilder selector,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine("Dataloader TasksAssignedToUserAsync");
         return await dbContext.Users
             .AsNoTracking()
             .Where(s => userIds.Contains(s.Id))

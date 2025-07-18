@@ -16,5 +16,9 @@ public sealed class UserEntity
     public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; init; } = [];
     public ICollection<TasksCreatedByUser> TasksCreatedByUser { get; init; } = [];
     
+    public int NumberAssingnedTasks => TasksCreatedByUser.Count(tu => tu.UserId == Id);
+    
+    public int NumberCreatedTasks => TasksCreatedByUser.Count(tu => tu.UserId == Id);
+    
     //public ICollection<TaskEntity> CretedTasks { get; init; } = []; //easier to do like this but what if we have a co-authors
 }

@@ -18,12 +18,14 @@ public static partial class TaskType
                 => await ctx.DataLoader<ITaskByIdDataLoader>()
                     .LoadAsync(id, ctx.RequestAborted));
 
-        descriptor.Field(t => t.TasksCreatedByUser)
-            .ResolveWith<TaskResolvers>(r => r.GetUsersCreatedTasks(default!, default!))
+        descriptor.Field(t => t.TasksCreatedByUser).Name("tasksCr")
+            .ResolveWith<TaskResolvers>(r => 
+                r.GetTasksCreatedByUserObjects(default!, default!))
             .UseFiltering<TasksCreatedByUserFilterInputType>();
-        
-        descriptor.Field(t => t.TasksAssignedToUser)
-            .ResolveWith<TaskResolvers>(r => r.GetUsersAssignedToTasks(default!, default!))
+    
+        descriptor.Field(t => t.TasksAssignedToUser).Name("tasksAs")
+            .ResolveWith<TaskResolvers>(r => 
+                r.GetTasksAssignedToUserObjects(default!, default!))
             .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
