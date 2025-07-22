@@ -4,7 +4,7 @@ using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.Infrastructure.Data.Configurations;
 
-public class TasksCreatedByUserConfiguration : IEntityTypeConfiguration<TasksCreatedByUser>
+/*public class TasksCreatedByUserConfiguration : IEntityTypeConfiguration<TasksCreatedByUser>
 {
     public void Configure(EntityTypeBuilder<TasksCreatedByUser> builder)
     {
@@ -12,4 +12,4 @@ public class TasksCreatedByUserConfiguration : IEntityTypeConfiguration<TasksCre
         builder
             .HasKey(ss => new { ss.TaskId, ss.UserId });
     }
-}
+}*/

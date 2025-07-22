@@ -51,7 +51,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddServiceConfigs(builder);
 
 builder.AddGraphQL()
-    .AddMaxExecutionDepthRule(5).AddTypes()
+    .AddMaxExecutionDepthRule(10).AddTypes()
     .AddGlobalObjectIdentification()
     .AddQueryContext()
     .AddDbContextCursorPagingProvider()
@@ -89,5 +89,10 @@ app.MapIdentityApi<TaskManagerUser>();
 app.MapAuthEndpoints();
 
 app.MapGet("/weather", () => "The weather is nice").RequireAuthorization("UserPolicy");
+
+if (app.Environment.IsDevelopment())
+{
+    await FakeDataSeeder.SeedAsync(app.Services);
+}
 
 app.RunWithGraphQLCommands(args);

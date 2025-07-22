@@ -15,7 +15,7 @@ public class UserDataLoaders
         CancellationToken cancellationToken)
     {
         Console.WriteLine("Dataloader UserByIdAsync");
-        return await dbContext.Users
+        return await dbContext.UserProfiles
             .AsNoTracking()
             .Where(a => ids.Contains(a.Id))
             .Select(a => a.Id, selector)
@@ -30,10 +30,11 @@ public class UserDataLoaders
         CancellationToken cancellationToken)
     {
         Console.WriteLine("Dataloader TasksCreatedByUserAsync");
-        return await dbContext.Users
+        
+        return await dbContext.UserProfiles
             .AsNoTracking()
             .Where(s => userIds.Contains(s.Id))
-            .Select(s => s.Id, s => s.TasksCreatedByUser.Select(ss => ss.Task), selector)
+            .Select(s => s.Id, s => s.TasksCreated, selector)
             .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
     }
     
@@ -45,7 +46,7 @@ public class UserDataLoaders
         CancellationToken cancellationToken)
     {
         Console.WriteLine("Dataloader TasksAssignedToUserAsync");
-        return await dbContext.Users
+        return await dbContext.UserProfiles
             .AsNoTracking()
             .Where(s => userIds.Contains(s.Id))
             .Select(s => s.Id, s => s.TasksAssignedToUser.Select(ss => ss.Task), selector)

@@ -4,7 +4,7 @@ using RealTaskManager.Infrastructure.Data;
 
 namespace RealTaskManager.UseCases.Authentication.RefreshTokens;
 
-public class GetRefreshTokenHandler(CustomIdentityDbContext dbContext)
+public class GetRefreshTokenHandler(RealTaskManagerDbContext dbContext)
 {
     public async Task<RefreshTokenData?> HandleAsync(GetRefreshTokenRequest request, CancellationToken ct)
     {

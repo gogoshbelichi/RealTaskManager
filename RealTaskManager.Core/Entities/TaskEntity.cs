@@ -13,8 +13,7 @@ public sealed class TaskEntity
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     
     public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; init; } = [];
-    public ICollection<TasksCreatedByUser> TasksCreatedByUser { get; init; } = [];
-    
-    //public UserEntity CreatedBy { get; init; } //easier to do like this but what if we have a co-authors
+    public required Guid CreatedByUserId { get; set; }
+    public required UserEntity CreatedBy { get; init; }
 }
 

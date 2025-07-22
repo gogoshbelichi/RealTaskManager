@@ -4,7 +4,7 @@ using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.Infrastructure.Data;
 
-public class CustomIdentityDbContext(DbContextOptions<CustomIdentityDbContext> options)
+/*public class CustomIdentityDbContext(DbContextOptions<CustomIdentityDbContext> options)
     : IdentityDbContext<TaskManagerUser>(options)
 {
     public DbSet<RefreshTokenData> RefreshTokens => Set<RefreshTokenData>();
@@ -19,4 +19,4 @@ public class CustomIdentityDbContext(DbContextOptions<CustomIdentityDbContext> o
             .HasOne(u => u.User)
             .WithMany(rt => rt.RefreshTokens);
     }
-}
+}*/

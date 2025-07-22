@@ -1,10 +1,8 @@
-using System.Security.Claims;
 using GreenDonut.Data;
 using HotChocolate.Execution.Processing;
-using Microsoft.IdentityModel.JsonWebTokens;
+using HotChocolate.Types.Pagination;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.GraphQL.Tasks;
-using JsonClaimValueTypes = System.IdentityModel.Tokens.Jwt.JsonClaimValueTypes;
 
 namespace RealTaskManager.GraphQL.Users;
 
@@ -13,8 +11,7 @@ public static partial class UserType
 { 
     static partial void Configure(IObjectTypeDescriptor<UserEntity> descriptor)
     {
-        descriptor.Authorize("User", "Administrator");
-        descriptor.Field(u => u.IdentityId).Ignore();
+        //descriptor.Authorize("User", "Administrator");
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)
@@ -28,24 +25,18 @@ public static partial class UserType
 
         descriptor.Field(u => u.Roles);
 
-        descriptor.Field(u => u.NumberCreatedTasks);
-        
-        descriptor.Field(u => u.NumberAssingnedTasks);
-
-        descriptor.Field(t => t.TasksCreatedByUser)
-            .ResolveWith<TaskResolvers>(r =>
-                r.GetTasksCreatedByUserObjectsForUser(default!, default!))
-            .UseFiltering<TasksCreatedByUserFilterInputType>();
+        /*descriptor.Field(t => t.TasksCreated)
+            .UsePaging()
+            .UseFiltering<TasksCreatedByUserFilterInputType>();*/
 
         descriptor.Field(t => t.TasksAssignedToUser)
-            .ResolveWith<TaskResolvers>(r =>
-                r.GetTasksAssignedToUserObjectsForUser(default!, default!))
+            .UsePaging()
             .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
-    [BindMember(nameof(UserEntity.TasksCreatedByUser))]
+    //[BindMember(nameof(UserEntity.TasksCreatedByUser))]
     [GraphQLName("tasksCreated")]
-    public static async Task<IEnumerable<TaskEntity>> GetTasksCreatedByUserAsync(
+    public static async Task<IEnumerable<TaskEntity>> GetTasksCreatedAsync(
         [Parent] UserEntity userEntity,
         ITasksCreatedByUserDataLoader tasksCreatedByUserId,
         ISelection selection,

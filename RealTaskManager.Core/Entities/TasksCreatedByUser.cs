@@ -1,6 +1,6 @@
 namespace RealTaskManager.Core.Entities;
 
-public sealed class TasksCreatedByUser
+/*public sealed class TasksCreatedByUser
 {
     public Guid TaskId { get; init; }
 
@@ -9,4 +9,4 @@ public sealed class TasksCreatedByUser
     public Guid UserId { get; init; }
 
     public UserEntity User { get; init; } = null!;
-}
+}*/

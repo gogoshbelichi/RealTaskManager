@@ -9,11 +9,11 @@ using RealTaskManager.Infrastructure.Data;
 
 #nullable disable
 
-namespace RealTaskManager.Infrastructure.Data.Migrations.Identity
+namespace RealTaskManager.Infrastructure.Data.Migrations.TaskManager
 {
-    [DbContext(typeof(CustomIdentityDbContext))]
-    [Migration("20250714203133_IdentityUpdate")]
-    partial class IdentityUpdate
+    [DbContext(typeof(RealTaskManagerDbContext))]
+    [Migration("20250722124754_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -199,6 +199,39 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.Identity
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("RealTaskManager.Core.Entities.TaskEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.ToTable("Tasks");
+                });
+
             modelBuilder.Entity("RealTaskManager.Core.Entities.TaskManagerUser", b =>
                 {
                     b.Property<string>("Id")
@@ -263,6 +296,52 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.Identity
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("RealTaskManager.Core.Entities.TasksAssignedToUser", b =>
+                {
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("TaskId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TasksAssignedToUsers");
+                });
+
+            modelBuilder.Entity("RealTaskManager.Core.Entities.UserEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.PrimitiveCollection<string[]>("Roles")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("UserProfiles");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -325,9 +404,51 @@ namespace RealTaskManager.Infrastructure.Data.Migrations.Identity
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("RealTaskManager.Core.Entities.TaskEntity", b =>
+                {
+                    b.HasOne("RealTaskManager.Core.Entities.UserEntity", "CreatedBy")
+                        .WithMany("TasksCreated")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("RealTaskManager.Core.Entities.TasksAssignedToUser", b =>
+                {
+                    b.HasOne("RealTaskManager.Core.Entities.TaskEntity", "Task")
+                        .WithMany("TasksAssignedToUser")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealTaskManager.Core.Entities.UserEntity", "User")
+                        .WithMany("TasksAssignedToUser")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RealTaskManager.Core.Entities.TaskEntity", b =>
+                {
+                    b.Navigation("TasksAssignedToUser");
+                });
+
             modelBuilder.Entity("RealTaskManager.Core.Entities.TaskManagerUser", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("RealTaskManager.Core.Entities.UserEntity", b =>
+                {
+                    b.Navigation("TasksAssignedToUser");
+
+                    b.Navigation("TasksCreated");
                 });
 #pragma warning restore 612, 618
         }

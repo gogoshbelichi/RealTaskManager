@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.Infrastructure.Data;
 using RealTaskManager.UseCases.Authentication.RefreshTokens;
@@ -42,36 +41,27 @@ public static class AuthEndpoints
             UserManager<TaskManagerUser> userManager,
             CustomRegisterRequest request) =>
         {
+            const string usernameTaken = "Username is already taken.";
+            const string emailTaken = "Account with this email address is already exists.";
+            const string usernameAndEmailTaken = usernameTaken + " " + emailTaken;
             // Validating request
             var userByEmail = await userManager.FindByEmailAsync(request.Email);
             var userByUsername = await userManager.FindByNameAsync(request.Username);
 
             if (userByEmail is not null && userByUsername is not null)
             {
-                return Results.BadRequest(
-                    "Username is already taken and account with this email address is already exists.");
+                return Results.BadRequest(usernameAndEmailTaken);
             }
             if (userByUsername is not null)
             {
-                return Results.BadRequest("Username already taken.");
+                return Results.BadRequest(usernameTaken);
             }
             if (userByEmail is not null)
             {
-                return Results.BadRequest("You cant register account with this email address.");
+                return Results.BadRequest(emailTaken);
             }
             
-            // in AspNetUsers table
-            var createUserTaskCompletionSource = new TaskCompletionSource<bool>();
-            // in Users table
-            var createProfileTaskCompletionSource = new TaskCompletionSource<bool>();
-            
-            await userService.CreateUser(request, createUserTaskCompletionSource, createProfileTaskCompletionSource);
-            
-            if (createUserTaskCompletionSource.Task.Result is false ||
-                createProfileTaskCompletionSource.Task.Result is false)
-            {
-                return Results.BadRequest("Registration failed");
-            }
+            await userService.CreateUser(request);
             
             return Results.Created();
         });
@@ -80,6 +70,8 @@ public static class AuthEndpoints
             string role,
             RoleManager<IdentityRole> roleManager) =>
         {
+            
+            
             if (await roleManager.RoleExistsAsync(role)) return Results.Conflict("Role already exists");
             var result = await roleManager.CreateAsync(new IdentityRole(role));
             return result.Succeeded ? Results.Created() : Results.BadRequest("Role not created");
@@ -92,29 +84,25 @@ public static class AuthEndpoints
             CustomUserService userService
             ) =>
         {
-            // in AspNetUsers table
-            var assignRoleTaskCompletionSource = new TaskCompletionSource<bool>();
-            // in Users table
-            var mapRoleTaskCompletionSource = new TaskCompletionSource<bool>();
+            const string roleDoesNotExist = "Role does not exist";
             // validating role existence
             if (await roleManager.RoleExistsAsync(request.Role) is false)
             {
-                return Results.BadRequest("Role does not exist");
+                return Results.BadRequest(roleDoesNotExist);
             }
             // validating user existence
             var user = await userManager.FindByEmailAsync(request.Email);
             if (user is null) return Results.BadRequest("User not found");
             //role assignment
-            await userService.AssignRole(request, user, assignRoleTaskCompletionSource, mapRoleTaskCompletionSource);
+            await userService.AssignRole(request, user);
             
-            return assignRoleTaskCompletionSource.Task.Result && mapRoleTaskCompletionSource.Task.Result ?
-                Results.Accepted() : Results.BadRequest("Role is not assigned");
+            return Results.Accepted();
         }).RequireAuthorization();
 
         app.MapPost("/custom-refresh-token", async (
             GetRefreshTokenRequest request,
             TokenService tokenService,
-            CustomIdentityDbContext dbContext,
+            RealTaskManagerDbContext dbContext,
             CancellationToken ct) =>
         {
             await using var transaction = await dbContext.Database.BeginTransactionAsync(ct);
@@ -123,15 +111,15 @@ public static class AuthEndpoints
                 var user = await tokenService.TryGetUserByRefreshToken(request, ct);
                 if (user is null) return Results.Unauthorized();
                 var jti = Guid.NewGuid().ToString();
-                var access_token =  await tokenService.GenerateAccessToken(jti, user);
-                var refresh_token = await tokenService.GenerateRefreshToken(jti, user, ct);
+                var accessToken =  await tokenService.GenerateAccessToken(jti, user);
+                var refreshToken = await tokenService.GenerateRefreshToken(jti, user, ct);
             
-                if (string.IsNullOrEmpty(access_token) || string.IsNullOrEmpty(refresh_token))
+                if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
                     return Results.BadRequest("Authentication server internal problem, please try again later");
 
                 await dbContext.SaveChangesAsync(ct);
                 await transaction.CommitAsync(ct);
-                return Results.Ok(new TokensResponse(access_token, refresh_token));
+                return Results.Ok(new TokensResponse(accessToken, refreshToken));
             }
             catch (Exception)
             {

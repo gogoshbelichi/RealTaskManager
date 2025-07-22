@@ -3,7 +3,7 @@ using RealTaskManager.Infrastructure.Data;
 
 namespace RealTaskManager.UseCases.Authentication.RefreshTokens;
 
-public class AddRefreshTokenHandler(CustomIdentityDbContext dbContext)
+public class AddRefreshTokenHandler(RealTaskManagerDbContext dbContext)
 {
     public async Task<bool> HandleAsync(RefreshTokenData refreshTokenData, CancellationToken ct)
     {

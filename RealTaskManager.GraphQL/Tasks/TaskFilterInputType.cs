@@ -11,7 +11,7 @@ public sealed class TaskFilterInputType : FilterInputType<TaskEntity>
         
         descriptor.Field(s => s.Status);
 
-        descriptor.Field(s => s.TasksCreatedByUser);
+        descriptor.Field(s => s.CreatedBy);
         
         descriptor.Field(s => s.TasksAssignedToUser);
     }
@@ -28,7 +28,7 @@ public sealed class TasksAssignedToUserFilterInputType : FilterInputType<TasksAs
     }
 }
 
-public sealed class TasksCreatedByUserFilterInputType : FilterInputType<TasksCreatedByUser>
+/*public sealed class TasksCreatedByUserFilterInputType : FilterInputType<CreatedBy>
 {
     protected override void Configure(IFilterInputTypeDescriptor<TasksCreatedByUser> descriptor)
     {
@@ -37,4 +37,4 @@ public sealed class TasksCreatedByUserFilterInputType : FilterInputType<TasksCre
 
         descriptor.Field(t => t.User);
     }
-}
+}*/

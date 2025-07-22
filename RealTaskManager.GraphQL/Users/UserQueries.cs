@@ -3,6 +3,7 @@ using GreenDonut.Data;
 using HotChocolate.Authorization;
 using HotChocolate.Execution.Processing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.GraphQL.Tasks;
 using RealTaskManager.Infrastructure.Data;
@@ -12,17 +13,17 @@ namespace RealTaskManager.GraphQL.Users;
 [QueryType]
 public static class UserQueries
 {
-    [Authorize("AdminPolicy")]
+    //[Authorize("AdminPolicy")]
     [UsePaging]
     [UseFiltering(typeof(UserFilterInputType))]
     [UseSorting]
     public static IQueryable<UserEntity> GetUsers(RealTaskManagerDbContext dbContext)
     {
         Console.WriteLine("UserQueries GetUsers");
-        return dbContext.Users.AsNoTracking().OrderBy(t => t.Id);
+        return dbContext.UserProfiles.AsNoTracking().OrderBy(u => u.Id);
     }
     
-    [Authorize("AdminPolicy")]
+    //[Authorize("AdminPolicy")]
     [NodeResolver]
     public static async Task<UserEntity?> GetUserByIdAsync(
         Guid id,
@@ -34,29 +35,28 @@ public static class UserQueries
         return await userById.Select(selection).LoadAsync(id, cancellationToken);
     }
     
-    [Authorize("AdminPolicy")]
+    //[Authorize("AdminPolicy")]
     public static async Task<IEnumerable<UserEntity>> GetUsersByIdAsync(
         [ID<UserEntity>] Guid[] ids,
-        IUserByIdDataLoader userById,
+        IUserByIdDataLoader usersById,
         ISelection selection,
         CancellationToken cancellationToken)
     {
         Console.WriteLine("UserQueries GetUsersByIdAsync");
-        return await userById.Select(selection).LoadRequiredAsync(ids, cancellationToken);
+        return await usersById.Select(selection).LoadRequiredAsync(ids, cancellationToken);
     }
     
-    [Authorize("UserPolicy")]
+    [GraphQLDescription("You, your created tasks and tasks you are assigned to")]
+    //[Authorize("UserPolicy")]
     public static IQueryable<UserEntity> GetMe(
+        ISelection selection,
         RealTaskManagerDbContext dbContext,
         ClaimsPrincipal? principal)
     {
         Console.WriteLine("UserQueries GetMe");
-        var userId = principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId is null) throw new UserNotFoundException();
-        return dbContext.Users.AsNoTracking().Where(u => u.IdentityId == userId)
-            .Include(u => u.TasksAssignedToUser)
-            .ThenInclude(t => t.Task)
-            .Include(u => u.TasksCreatedByUser)
-            .ThenInclude(t => t.Task);
+        var username = principal?.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.PreferredUsername)?.Value;
+        if (username is null) throw new UserNotFoundException();
+        return dbContext.UserProfiles.AsNoTracking().Where(u => u.Username == username)
+            .Select(selection);
     }
 }

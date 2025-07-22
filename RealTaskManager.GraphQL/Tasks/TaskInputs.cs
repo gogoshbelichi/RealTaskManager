@@ -1,3 +1,4 @@
+using HotChocolate.Authorization;
 using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.GraphQL.Tasks;
@@ -5,7 +6,8 @@ namespace RealTaskManager.GraphQL.Tasks;
 public record AddTaskInput(
     string Title,
     string? Description,
-    TaskStatusEnum? Status
+    TaskStatusEnum? Status,
+    [property: Authorize("AdminPolicy")] [property: ID<UserEntity>] string? AssignToUserByUsername
 );
 
 public record AssignTaskInput(

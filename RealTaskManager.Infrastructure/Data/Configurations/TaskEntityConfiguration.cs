@@ -19,13 +19,13 @@ public class TaskEntityConfiguration : IEntityTypeConfiguration<TaskEntity>
         builder.Property(t => t.Status)
             .HasConversion(v => v.ToString(), v => Enum.Parse<TaskStatusEnum>(v));
         
-        /*builder
-            .HasOne(t => t.CreatedBy)
-            .WithMany(u => u.CreatedTasks)
-            .HasForeignKey(t => t.CreatedById)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder
+            .HasOne(t => t.CreatedBy)
+            .WithMany(u => u.TasksCreated)
+            .HasForeignKey(t => t.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        /*builder
             .HasOne(t => t.AssignedTo)
             .WithMany(u => u.AssignedTasks)
             .HasForeignKey(t => t.AssignedToId)

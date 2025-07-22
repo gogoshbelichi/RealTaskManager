@@ -10,7 +10,7 @@ public static class SerivceCollectionsExtensions
     {
         builder.Services.AddIdentityCore<TaskManagerUser>()
             .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<CustomIdentityDbContext>()
+            .AddEntityFrameworkStores<RealTaskManagerDbContext>()
             .AddApiEndpoints()
             .AddDefaultTokenProviders();
         

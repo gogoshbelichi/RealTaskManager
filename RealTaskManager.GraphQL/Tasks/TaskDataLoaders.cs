@@ -21,7 +21,7 @@ public static class TaskDataLoaders
             .ToDictionaryAsync(s => s.Id, cancellationToken);
     }
     
-    [DataLoader]
+    /*[DataLoader]
     public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersCreatedTasksAsync(
         IReadOnlyList<Guid> taskIds,
         RealTaskManagerDbContext dbContext,
@@ -33,7 +33,7 @@ public static class TaskDataLoaders
             .Where(s => taskIds.Contains(s.Id))
             .Select(s => s.Id, s => s.TasksCreatedByUser.Select(ss => ss.User), selector)
             .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
-    }
+    }*/
     
     [DataLoader]
     public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersAssignedToTasksAsync(

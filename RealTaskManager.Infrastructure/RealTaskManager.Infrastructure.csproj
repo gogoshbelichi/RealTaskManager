@@ -15,4 +15,8 @@
       <ProjectReference Include="..\RealTaskManager.Core\RealTaskManager.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Data\Migrations\TaskManager\" />
+    </ItemGroup>
+
 </Project>

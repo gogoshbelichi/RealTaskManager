@@ -14,10 +14,7 @@ public sealed class UserFilterInputType : FilterInputType<UserEntity>
         descriptor.Field(u => u.Username);
         descriptor.Field(u => u.Roles);
         
-        descriptor.Field(u => u.NumberCreatedTasks);
-        descriptor.Field(u => u.NumberAssingnedTasks);
-        
-        descriptor.Field(u => u.TasksCreatedByUser);
+        descriptor.Field(u => u.TasksCreated);
         descriptor.Field(u => u.TasksAssignedToUser);
     }
 }
@@ -33,7 +30,7 @@ public sealed class UsersAssignedToTasksFilterInputType : FilterInputType<TasksA
     }
 }
 
-public sealed class UsersCreatedTasksFilterInputType : FilterInputType<TasksCreatedByUser>
+/*public sealed class UsersCreatedTasksFilterInputType : FilterInputType<TasksCreatedByUser>
 {
     protected override void Configure(IFilterInputTypeDescriptor<TasksCreatedByUser> descriptor)
     {
@@ -42,4 +39,4 @@ public sealed class UsersCreatedTasksFilterInputType : FilterInputType<TasksCrea
 
         descriptor.Field(t => t.Task).Type<TaskFilterInputType>();
     }
-}
+}*/

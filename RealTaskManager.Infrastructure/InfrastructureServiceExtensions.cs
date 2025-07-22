@@ -14,8 +14,8 @@ public static class InfrastructureServiceExtensions
         services.AddDbContext<RealTaskManagerDbContext>(options =>
             options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
         
-        services.AddDbContext<CustomIdentityDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
+        /*services.AddDbContext<CustomIdentityDbContext>(options =>
+            options.UseNpgsql(config.GetConnectionString("DefaultConnection")));*/
         
         return services;
     }
