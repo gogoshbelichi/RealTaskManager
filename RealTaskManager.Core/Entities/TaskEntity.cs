@@ -10,10 +10,11 @@ public sealed class TaskEntity
     [MaxLength(1000)]
     public string? Description { get; set; }
     public TaskStatusEnum Status { get; set; }
-    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
     
-    public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; init; } = [];
-    public required Guid CreatedByUserId { get; set; }
+    public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; set; } = [];
+    public ICollection<UserEntity> UsersAssigned { get; set; } = [];
+    public required Guid CreatedByUserId { get; init; }
     public required UserEntity CreatedBy { get; init; }
 }
 

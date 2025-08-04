@@ -25,10 +25,25 @@ public class TaskEntityConfiguration : IEntityTypeConfiguration<TaskEntity>
             .HasForeignKey(t => t.CreatedByUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder
+            .HasMany(e => e.UsersAssigned)
+            .WithMany(e => e.TasksAssignedTo)
+            .UsingEntity<TasksAssignedToUser>(
+                r => r
+                    .HasOne<UserEntity>(e => e.User)
+                    .WithMany(e => e.TasksAssignedToUser)
+                    .HasForeignKey(e => e.UserId),
+                l => l
+                    .HasOne<TaskEntity>(e => e.Task)
+                    .WithMany(e => e.TasksAssignedToUser)
+                    .HasForeignKey(e => e.TaskId),
+                joinEntity => joinEntity
+                    .HasKey(tsd => new { tsd.TaskId, tsd.UserId }));
+    }
+
         /*builder
             .HasOne(t => t.AssignedTo)
-            .WithMany(u => u.AssignedTasks)
-            .HasForeignKey(t => t.AssignedToId)
-            .OnDelete(DeleteBehavior.SetNull);*/
-    }
+            .WithMany(u => u.TasksAssignedTo)
+            .HasForeignKey(t => t.AssignedToUserId)
+            .OnDelete(DeleteBehavior.Cascade);*/
 }

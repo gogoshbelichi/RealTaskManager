@@ -39,7 +39,6 @@ public static class TasksMutations
         {
             var assigned = dbContext.UserProfiles.FirstOrDefault(u => u.Username == input.AssignToUserByUsername);
             if (assigned is null) throw new UserNotFoundException();
-            task.TasksAssignedToUser.Add(new TasksAssignedToUser(){ Task = task, User = assigned });
         }
         
 
@@ -75,7 +74,7 @@ public static class TasksMutations
         var user = await dbContext.UserProfiles.FirstOrDefaultAsync(u => u.Username == claims
             .FindFirstValue(JwtRegisteredClaimNames.PreferredUsername), cancellationToken) ?? throw new UserNotFoundException();
         
-        user.TasksAssignedToUser.Add(new TasksAssignedToUser(){ Task = task, User = user});
+        user.TasksAssignedToUser.Add(new TasksAssignedToUser(){ Task = task, User = user, LastAssignedAt = DateTimeOffset.UtcNow });
         
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -139,7 +138,7 @@ public static class TasksMutations
         var user = await dbContext.UserProfiles.FirstOrDefaultAsync(u => u.Username == claims
             .FindFirstValue(JwtRegisteredClaimNames.PreferredUsername), cancellationToken) ?? throw new UserNotFoundException();
         
-        task.TasksAssignedToUser.Add(new TasksAssignedToUser { Task = task, User = user});
+        task.TasksAssignedToUser.Add(new TasksAssignedToUser { Task = task, User = user, LastAssignedAt = DateTimeOffset.UtcNow });
         task.Status = TaskStatusEnum.InProgress;
 
         await dbContext.SaveChangesAsync(cancellationToken);

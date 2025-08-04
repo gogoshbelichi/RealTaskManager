@@ -1,7 +1,8 @@
 using GreenDonut.Data;
-using HotChocolate.Authorization;
 using HotChocolate.Execution.Processing;
+using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.Infrastructure.Data;
 
@@ -10,16 +11,7 @@ namespace RealTaskManager.GraphQL.Tasks;
 [QueryType]
 public static class TaskQueries
 {
-    [Authorize]
-    [UsePaging]
-    [UseFiltering(typeof(TaskFilterInputType))]
-    [UseSorting]
-    public static IQueryable<TaskEntity> GetTasks(RealTaskManagerDbContext dbContext)
-    {
-        return dbContext.Tasks.AsNoTracking().OrderBy(t => t.Title).ThenBy(t => t.Id);
-    }
-    
-    [Authorize]
+    //[Authorize]
     [NodeResolver]
     public static async Task<TaskEntity?> GetTaskByIdAsync(
         Guid id,
@@ -30,7 +22,7 @@ public static class TaskQueries
         return await taskById.Select(selection).LoadAsync(id, cancellationToken);
     }
     
-    [Authorize]
+    //[Authorize]
     public static async Task<IEnumerable<TaskEntity>> GetTasksByIdAsync(
         [ID<TaskEntity>] Guid[] ids,
         ITaskByIdDataLoader taskById,
@@ -38,5 +30,19 @@ public static class TaskQueries
         CancellationToken cancellationToken)
     {
         return await taskById.Select(selection).LoadRequiredAsync(ids, cancellationToken);
+    }
+    
+    //[Authorize]
+    [UseFiltering/*(typeof(TaskFilter))*/]
+    [UseSorting]
+    public static async Task<PageConnection<TaskEntity>> GetTasks(
+        PagingArguments args,
+        QueryContext<TaskEntity> query,
+        RealTaskManagerDbContext dbContext,
+        CancellationToken ct)
+    {
+        var page = await dbContext.Tasks.With(query).OrderBy(t => t.Id).ToPageAsync(args, ct);
+
+        return new PageConnection<TaskEntity>(page);
     }
 }

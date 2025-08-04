@@ -1,9 +1,10 @@
 using HotChocolate.Data.Filters;
 using RealTaskManager.Core.Entities;
+using RealTaskManager.GraphQL.Users;
 
 namespace RealTaskManager.GraphQL.Tasks;
 
-public sealed class TaskFilterInputType : FilterInputType<TaskEntity>
+public sealed class TaskFilter : FilterInputType<TaskEntity>
 {
     protected override void Configure(IFilterInputTypeDescriptor<TaskEntity> descriptor)
     {
@@ -16,25 +17,3 @@ public sealed class TaskFilterInputType : FilterInputType<TaskEntity>
         descriptor.Field(s => s.TasksAssignedToUser);
     }
 }
-
-public sealed class TasksAssignedToUserFilterInputType : FilterInputType<TasksAssignedToUser>
-{
-    protected override void Configure(IFilterInputTypeDescriptor<TasksAssignedToUser> descriptor)
-    {
-        descriptor.Name("TasksAssignedToUserFilter");
-        descriptor.BindFieldsExplicitly();
-
-        descriptor.Field(t => t.User);
-    }
-}
-
-/*public sealed class TasksCreatedByUserFilterInputType : FilterInputType<CreatedBy>
-{
-    protected override void Configure(IFilterInputTypeDescriptor<TasksCreatedByUser> descriptor)
-    {
-        descriptor.Name("TasksCreatedByUserFilter");
-        descriptor.BindFieldsExplicitly();
-
-        descriptor.Field(t => t.User);
-    }
-}*/

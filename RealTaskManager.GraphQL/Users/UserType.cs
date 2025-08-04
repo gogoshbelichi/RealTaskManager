@@ -2,15 +2,15 @@ using GreenDonut.Data;
 using HotChocolate.Execution.Processing;
 using HotChocolate.Types.Pagination;
 using RealTaskManager.Core.Entities;
-using RealTaskManager.GraphQL.Tasks;
+using RealTaskManager.GraphQL.TasksAssignedToUsers;
 
 namespace RealTaskManager.GraphQL.Users;
 
-[ObjectType<UserEntity>]
-public static partial class UserType
+public class UserType : ObjectType<UserEntity>
 { 
-    static partial void Configure(IObjectTypeDescriptor<UserEntity> descriptor)
+    protected override void Configure(IObjectTypeDescriptor<UserEntity> descriptor)
     {
+        descriptor.BindFieldsExplicitly();
         //descriptor.Authorize("User", "Administrator");
         descriptor
             .ImplementsNode()
@@ -19,46 +19,50 @@ public static partial class UserType
                 => await ctx.DataLoader<IUserByIdDataLoader>()
                     .LoadAsync(id, ctx.RequestAborted));
         
-        descriptor.Field(u => u.Username);
+        descriptor.Field(u => u.Username).Type<StringType>();
         
-        descriptor.Field(u => u.Email);
+        descriptor.Field(u => u.Email).Type<StringType>();
 
         descriptor.Field(u => u.Roles);
-
-        /*descriptor.Field(t => t.TasksCreated)
-            .UsePaging()
-            .UseFiltering<TasksCreatedByUserFilterInputType>();*/
-
-        descriptor.Field(t => t.TasksAssignedToUser)
-            .UsePaging()
-            .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
-    //[BindMember(nameof(UserEntity.TasksCreatedByUser))]
+    [BindField(nameof(UserEntity.TasksCreated))]
     [GraphQLName("tasksCreated")]
-    public static async Task<IEnumerable<TaskEntity>> GetTasksCreatedAsync(
+    [UsePaging]
+    [UseFiltering]
+    [UseSorting]
+    public static async Task<Connection<TaskEntity>> GetTasksCreatedAsync(
         [Parent] UserEntity userEntity,
         ITasksCreatedByUserDataLoader tasksCreatedByUserId,
         ISelection selection,
-        CancellationToken cancellationToken)
+        PagingArguments args,
+        CancellationToken ct)
     {
         Console.WriteLine("UserType GetTasksCreatedByUserAsync");
         return await tasksCreatedByUserId
+            .With(args)
             .Select(selection)
-            .LoadRequiredAsync(userEntity.Id, cancellationToken);
+            .LoadRequiredAsync(userEntity.Id, ct)
+            .ToConnectionAsync();
     }
     
-    [BindMember(nameof(UserEntity.TasksAssignedToUser))]
-    [GraphQLName("tasksAssigned")]
-    public static async Task<IEnumerable<TaskEntity>> GetTasksAssignedToUserAsync(
+    [BindField(nameof(UserEntity.TasksAssignedToUser))]
+    [GraphQLName("tasksAssignedToUser")]
+    [UsePaging]
+    [UseFiltering(typeof(UsersAssignedToTasksFilter))]
+    [UseSorting]
+    public static async Task<Connection<TasksAssignedToUser>> GetTasksAssignedToUserIdAsync(
         [Parent] UserEntity user,
-        ITasksAssignedToUserDataLoader loader,
+        ITasksAssignedToUserByUserIdDataLoader tasksAssignedToUserByUserId,
         ISelection selection,
+        PagingArguments args,
         CancellationToken ct)
     {
         Console.WriteLine("UserType GetTasksAssignedToUserAsync");
-        return await loader
+        return await tasksAssignedToUserByUserId
+            .With(args)
             .Select(selection)
-            .LoadRequiredAsync(user.Id, ct);
+            .LoadRequiredAsync(user.Id, ct)
+            .ToConnectionAsync();
     }
 }

@@ -21,8 +21,8 @@ public static class TaskDataLoaders
             .ToDictionaryAsync(s => s.Id, cancellationToken);
     }
     
-    /*[DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersCreatedTasksAsync(
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, UserEntity>> UserCreatedTaskAsync(
         IReadOnlyList<Guid> taskIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
@@ -30,19 +30,19 @@ public static class TaskDataLoaders
     {
         return await dbContext.Tasks
             .AsNoTracking()
-            .Where(s => taskIds.Contains(s.Id))
-            .Select(s => s.Id, s => s.TasksCreatedByUser.Select(ss => ss.User), selector)
-            .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
-    }*/
+            .Where(t => taskIds.Contains(t.Id))
+            .Select(t => new { t.Id, t.CreatedBy }, selector)
+            .ToDictionaryAsync(t => t.Id, t => t.CreatedBy, cancellationToken);
+    }
     
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersAssignedToTasksAsync(
+    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersAssignedToTaskAsync(
         IReadOnlyList<Guid> taskIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
         CancellationToken cancellationToken)
     {
-        return await dbContext.Tasks
+        return await dbContext.UserProfiles
             .AsNoTracking()
             .Where(s => taskIds.Contains(s.Id))
             .Select(s => s.Id, s => s.TasksAssignedToUser.Select(ss => ss.User), selector)
