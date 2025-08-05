@@ -21,6 +21,23 @@ public class UserDataLoaders
             .Select(a => a.Id, selector)
             .ToDictionaryAsync(a => a.Id, cancellationToken);
     }
+    
+    [DataLoader]
+    public static async Task<Page<UserEntity>> PagedUsersByIdAsync(
+        IReadOnlyList<Guid> ids,
+        RealTaskManagerDbContext dbContext,
+        ISelectorBuilder selector,
+        PagingArguments args,
+        CancellationToken cancellationToken)
+    {
+        Console.WriteLine("Dataloader UserByIdAsync");
+        return await dbContext.UserProfiles
+            .AsNoTracking()
+            .Where(a => ids.Contains(a.Id))
+            .OrderBy(a => a.Id)
+            .Select(a => a.Id, selector)
+            .ToPageAsync(args, cancellationToken);
+    }
 
     [DataLoader]
     public static async Task<IReadOnlyDictionary<Guid, Page<TaskEntity>>> TasksCreatedByUserAsync(

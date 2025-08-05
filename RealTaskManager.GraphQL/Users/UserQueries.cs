@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using GreenDonut.Data;
 using HotChocolate.Execution.Processing;
+using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using RealTaskManager.Core.Entities;
@@ -28,22 +29,29 @@ public static class UserQueries
         Guid id,
         IUserByIdDataLoader userById,
         ISelection selection,
-        CancellationToken cancellationToken)
+        CancellationToken ct)
     {
         Console.WriteLine("UserQueries GetUserByIdAsync");
-        return await userById.Select(selection).LoadAsync(id, cancellationToken);
+        return await userById.Select(selection).LoadAsync(id, ct);
     }
     
     //[Authorize("AdminPolicy")]
-    public static async Task<IEnumerable<UserEntity>> GetUsersByIdAsync(
+    [UsePaging]
+    public static async Task<Connection<UserEntity>> GetUsersByIdAsync(
         [ID<UserEntity>] Guid[] ids,
-        IUserByIdDataLoader usersById,
+        IPagedUsersByIdDataLoader usersById,
         ISelection selection,
-        CancellationToken cancellationToken)
+        PagingArguments args,
+        CancellationToken ct)
     {
         Console.WriteLine("UserQueries GetUsersByIdAsync");
-        return await usersById.Select(selection).LoadRequiredAsync(ids, cancellationToken);
+        return await usersById
+            .With(args)
+            .Select(selection)
+            .LoadRequiredAsync(ids, ct).ToConnectionAsync();
     }
+    
+    
     
     [GraphQLDescription("You, your created tasks and tasks you are assigned to")]
     //[Authorize("UserPolicy")]
