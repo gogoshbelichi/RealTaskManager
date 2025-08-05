@@ -24,41 +24,39 @@ public static partial class UserType
         descriptor.Field(u => u.Email);
 
         descriptor.Field(u => u.Roles);
-
-        /*descriptor.Field(t => t.TasksCreated)
-            .UsePaging()
-            .UseFiltering<TasksCreatedByUserFilterInputType>();*/
-
-        descriptor.Field(t => t.TasksAssignedToUser)
-            .UsePaging()
-            .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
-    //[BindMember(nameof(UserEntity.TasksCreatedByUser))]
-    [GraphQLName("tasksCreated")]
-    public static async Task<IEnumerable<TaskEntity>> GetTasksCreatedAsync(
-        [Parent] UserEntity userEntity,
+    [UsePaging]
+    [BindMember(nameof(UserEntity.TasksCreated))]
+    [GraphQLName("tasksCreatedlol")]
+    public static async Task<Connection<TaskEntity>> GetTasksCreatedAsync(
+        [Parent(requires: nameof(UserEntity.TasksCreated))] UserEntity userEntity,
         ITasksCreatedByUserDataLoader tasksCreatedByUserId,
         ISelection selection,
+        PagingArguments args,
         CancellationToken cancellationToken)
     {
         Console.WriteLine("UserType GetTasksCreatedByUserAsync");
         return await tasksCreatedByUserId
+            .With(args)
             .Select(selection)
-            .LoadRequiredAsync(userEntity.Id, cancellationToken);
+            .LoadRequiredAsync(userEntity.Id, cancellationToken).ToConnectionAsync();
     }
     
+    [UsePaging]
     [BindMember(nameof(UserEntity.TasksAssignedToUser))]
     [GraphQLName("tasksAssigned")]
-    public static async Task<IEnumerable<TaskEntity>> GetTasksAssignedToUserAsync(
-        [Parent] UserEntity user,
+    public static async Task<Connection<TasksAssignedToUser>?> GetTasksAssignedToUserAsync(
+        [Parent(requires: nameof(UserEntity.TasksAssignedToUser))] UserEntity user,
         ITasksAssignedToUserDataLoader loader,
         ISelection selection,
+        PagingArguments args,
         CancellationToken ct)
     {
         Console.WriteLine("UserType GetTasksAssignedToUserAsync");
         return await loader
+            .With(args)
             .Select(selection)
-            .LoadRequiredAsync(user.Id, ct);
+            .LoadRequiredAsync(user.Id, ct).ToConnectionAsync();
     }
 }

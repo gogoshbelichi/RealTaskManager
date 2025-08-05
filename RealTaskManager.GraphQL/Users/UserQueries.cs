@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using GreenDonut.Data;
-using HotChocolate.Authorization;
 using HotChocolate.Execution.Processing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
