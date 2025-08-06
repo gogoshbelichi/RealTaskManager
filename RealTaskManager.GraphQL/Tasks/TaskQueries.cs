@@ -1,6 +1,7 @@
 using GreenDonut.Data;
 using HotChocolate.Authorization;
 using HotChocolate.Execution.Processing;
+using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.Infrastructure.Data;
@@ -17,6 +18,20 @@ public static class TaskQueries
     public static IQueryable<TaskEntity> GetTasks(RealTaskManagerDbContext dbContext)
     {
         return dbContext.Tasks.AsNoTracking().OrderBy(t => t.Title).ThenBy(t => t.Id);
+    }
+    
+    [UsePaging, UseFiltering(typeof(TaskFilterInputType)), UseSorting]
+    public static async Task<Connection<TaskEntity>> GetTasksV2Async(
+        RealTaskManagerDbContext dbContext,
+        PagingArguments args,
+        QueryContext<TaskEntity>? query = default,
+        CancellationToken ct = default)
+    {
+        Console.WriteLine("UserQueries GetUsers");
+        return await dbContext.Tasks
+            .AsNoTracking()
+            .With(query, TasksOrdering.TasksDefaultOrder)
+            .ToPageAsync(args, ct).ToConnectionAsync();
     }
     
     [Authorize]
