@@ -57,7 +57,7 @@ public class UserDataLoaders
     }
     
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>?> TasksAssignedToUserAsync(
+    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUserAsync(
         IReadOnlyList<Guid> userIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
