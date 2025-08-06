@@ -23,6 +23,20 @@ public static class UserQueries
         return dbContext.UserProfiles.AsNoTracking().OrderBy(u => u.Id);
     }
     
+    [UsePaging, UseFiltering, UseSorting]
+    public static async Task<Connection<UserEntity>> GetUsersV2Async(
+        RealTaskManagerDbContext dbContext,
+        PagingArguments args,
+        QueryContext<UserEntity>? query = default,
+        CancellationToken ct = default)
+    {
+        Console.WriteLine("UserQueries GetUsers");
+        return await dbContext.UserProfiles
+            .AsNoTracking()
+            .With(query, UsersOrdering.UsersDefaultOrder)
+            .ToPageAsync(args, ct).ToConnectionAsync();
+    }
+    
     //[Authorize("AdminPolicy")]
     [NodeResolver]
     public static async Task<UserEntity?> GetUserByIdAsync(
