@@ -70,8 +70,6 @@ public static class AuthEndpoints
             string role,
             RoleManager<IdentityRole> roleManager) =>
         {
-            
-            
             if (await roleManager.RoleExistsAsync(role)) return Results.Conflict("Role already exists");
             var result = await roleManager.CreateAsync(new IdentityRole(role));
             return result.Succeeded ? Results.Created() : Results.BadRequest("Role not created");
