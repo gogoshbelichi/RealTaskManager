@@ -2,6 +2,7 @@ using GreenDonut.Data;
 using HotChocolate.Execution.Processing;
 using HotChocolate.Types.Pagination;
 using RealTaskManager.Core.Entities;
+using RealTaskManager.GraphQL.AssignedTasks;
 
 namespace RealTaskManager.GraphQL.Tasks;
 
@@ -26,6 +27,7 @@ public static partial class TaskType
     [UsePaging]
     [BindMember(nameof(TaskEntity.TasksAssignedToUser))]
     [GraphQLName("assignedTo")]
+    [GraphQLType<ListType<NonNullType<UsersAssignedToTaskType>>>]
     public static async Task<Connection<TasksAssignedToUser>> GetUsersAssignedToTasksAsync(
         [Parent(requires: nameof(TaskEntity.TasksAssignedToUser))] TaskEntity task,
         IUsersAssignedToTasksDataLoader userAssignedToTaskId,
