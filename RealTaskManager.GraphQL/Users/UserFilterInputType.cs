@@ -27,14 +27,3 @@ public sealed class UsersAssignedToTasksFilterInputType : FilterInputType<TasksA
         descriptor.Field(t => t.Task).Type<TaskFilterInputType>();
     }
 }
-
-/*public sealed class UsersCreatedTasksFilterInputType : FilterInputType<TasksCreatedByUser>
-{
-    protected override void Configure(IFilterInputTypeDescriptor<TasksCreatedByUser> descriptor)
-    {
-        descriptor.Name("UsersCreatedTasksFilter");
-        descriptor.BindFieldsExplicitly();
-
-        descriptor.Field(t => t.Task).Type<TaskFilterInputType>();
-    }
-}*/
