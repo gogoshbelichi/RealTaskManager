@@ -30,7 +30,7 @@ public static class UserQueries
         QueryContext<UserEntity>? query = default,
         CancellationToken ct = default)
     {
-        Console.WriteLine("UserQueries GetUsers");
+        Console.WriteLine("UserQueries GetUsersV2");
         return await dbContext.UserProfiles
             .AsNoTracking()
             .With(query, UsersOrdering.UsersDefaultOrder)

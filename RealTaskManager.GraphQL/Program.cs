@@ -54,7 +54,7 @@ builder.AddGraphQL()
     .AddMaxExecutionDepthRule(10).AddTypes()
     .AddGlobalObjectIdentification()
     .AddQueryContext()
-    .AddDbContextCursorPagingProvider()
+    .AddDbContextCursorPagingProvider().AddCursorKeySerializer(new EnumCursorKeySerializer<TaskStatusEnum>()) // check
     .AddPagingArguments()
     .AddFiltering()
     .AddSorting()

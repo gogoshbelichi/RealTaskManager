@@ -1,5 +1,6 @@
 using GreenDonut.Data;
 using HotChocolate.Execution.Processing;
+using HotChocolate.Types.Pagination;
 using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.GraphQL.Tasks;
@@ -32,7 +33,7 @@ public static partial class TaskType
             .UseFiltering<TasksAssignedToUserFilterInputType>();
     }
     
-    [BindMember(nameof(TaskEntity.TasksAssignedToUser))]
+    /*[BindMember(nameof(TaskEntity.TasksAssignedToUser))]
     [GraphQLName("assignedTo")]
     public static async Task<IEnumerable<UserEntity>> GetUsersAssignedToTasksAsync(
         [Parent(nameof(TaskEntity.Id))] TaskEntity userEntity,
@@ -43,8 +44,25 @@ public static partial class TaskType
         return await userAssignedToTaskId
             .Select(selection)
             .LoadRequiredAsync(userEntity.Id, cancellationToken);
-    }
+    }*/
     
+    [UsePaging]
+    [BindMember(nameof(TaskEntity.TasksAssignedToUser))]
+    [GraphQLName("assignedTo")]
+    public static async Task<Connection<TasksAssignedToUser>> GetUsersAssignedToTasksAsync(
+        [Parent(requires: nameof(TaskEntity.TasksAssignedToUser))] TaskEntity task,
+        IUsersAssignedToTasksDataLoader userAssignedToTaskId,
+        ISelection selection,
+        PagingArguments args,
+        CancellationToken cancellationToken)
+    {
+        return await userAssignedToTaskId
+            .With(args)
+            .Select(selection)
+            .LoadAsync(task.Id, cancellationToken)
+            .ToConnectionAsync();
+    }
+    //
     /*[BindMember(nameof(TaskEntity.TasksCreatedByUser))]
     [GraphQLName("createdBy")]
     public static async Task<IEnumerable<UserEntity>> GetUsersCreatedTaskAsync(

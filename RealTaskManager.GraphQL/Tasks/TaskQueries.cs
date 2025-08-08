@@ -20,14 +20,14 @@ public static class TaskQueries
         return dbContext.Tasks.AsNoTracking().OrderBy(t => t.Title).ThenBy(t => t.Id);
     }
     
-    [UsePaging, UseFiltering(typeof(TaskFilterInputType)), UseSorting]
+    [UsePaging, UseFiltering(typeof(TaskFilterInputType)), UseSorting(typeof(TasksSorting))]
     public static async Task<Connection<TaskEntity>> GetTasksV2Async(
         RealTaskManagerDbContext dbContext,
         PagingArguments args,
         QueryContext<TaskEntity>? query = default,
         CancellationToken ct = default)
     {
-        Console.WriteLine("UserQueries GetUsers");
+        Console.WriteLine("TaskQueries GetTasksV2");
         return await dbContext.Tasks
             .AsNoTracking()
             .With(query, TasksOrdering.TasksDefaultOrder)

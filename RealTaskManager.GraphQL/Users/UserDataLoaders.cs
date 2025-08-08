@@ -67,7 +67,7 @@ public class UserDataLoaders
         Console.WriteLine("Dataloader TasksAssignedToUserAsync");
         return await dbContext.TasksAssignedToUsers
             .AsNoTracking()
-            .Where(s => userIds.Contains(s.UserId) && s.UserId != Guid.Empty)
+            .Where(s => userIds.Contains(s.UserId))
             .OrderBy(s => s.UserId)
             .Select(ss => ss.UserId, selector)
             .ToBatchPageAsync(s => s.UserId, args, cancellationToken);

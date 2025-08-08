@@ -21,31 +21,19 @@ public static class TaskDataLoaders
             .ToDictionaryAsync(s => s.Id, cancellationToken);
     }
     
-    /*[DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersCreatedTasksAsync(
-        IReadOnlyList<Guid> taskIds,
-        RealTaskManagerDbContext dbContext,
-        ISelectorBuilder selector,
-        CancellationToken cancellationToken)
-    {
-        return await dbContext.Tasks
-            .AsNoTracking()
-            .Where(s => taskIds.Contains(s.Id))
-            .Select(s => s.Id, s => s.TasksCreatedByUser.Select(ss => ss.User), selector)
-            .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
-    }*/
-    
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, UserEntity[]>> UsersAssignedToTasksAsync(
+    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> UsersAssignedToTasksAsync(
         IReadOnlyList<Guid> taskIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
+        PagingArguments args,
         CancellationToken cancellationToken)
     {
-        return await dbContext.Tasks
+        return await dbContext.TasksAssignedToUsers
             .AsNoTracking()
-            .Where(s => taskIds.Contains(s.Id))
-            .Select(s => s.Id, s => s.TasksAssignedToUser.Select(ss => ss.User), selector)
-            .ToDictionaryAsync(r => r.Key, r => r.Value.ToArray(), cancellationToken);
+            .Where(s => taskIds.Contains(s.TaskId))
+            .OrderBy(s => s.TaskId)
+            .Select(ss => ss.TaskId, selector)
+            .ToBatchPageAsync(s => s.TaskId, args, cancellationToken);
     }
 }
