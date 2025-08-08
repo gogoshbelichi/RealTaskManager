@@ -11,15 +11,6 @@ namespace RealTaskManager.GraphQL.Tasks;
 [QueryType]
 public static class TaskQueries
 {
-    [Authorize]
-    [UsePaging]
-    [UseFiltering(typeof(TaskFilterInputType))]
-    [UseSorting]
-    public static IQueryable<TaskEntity> GetTasks(RealTaskManagerDbContext dbContext)
-    {
-        return dbContext.Tasks.AsNoTracking().OrderBy(t => t.Title).ThenBy(t => t.Id);
-    }
-    
     [UsePaging, UseFiltering(typeof(TaskFilterInputType)), UseSorting(typeof(TasksSorting))]
     public static async Task<Connection<TaskEntity>> GetTasksV2Async(
         RealTaskManagerDbContext dbContext,

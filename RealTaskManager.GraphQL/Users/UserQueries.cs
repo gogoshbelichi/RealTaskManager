@@ -14,17 +14,8 @@ namespace RealTaskManager.GraphQL.Users;
 public static class UserQueries
 {
     //[Authorize("AdminPolicy")]
-    [UsePaging]
-    [UseFiltering(typeof(UserFilterInputType))]
-    [UseSorting]
-    public static IQueryable<UserEntity> GetUsers(RealTaskManagerDbContext dbContext)
-    {
-        Console.WriteLine("UserQueries GetUsers");
-        return dbContext.UserProfiles.AsNoTracking().OrderBy(u => u.Id);
-    }
-    
-    [UsePaging, UseFiltering, UseSorting]
-    public static async Task<Connection<UserEntity>> GetUsersV2Async(
+    [UsePaging, UseFiltering(typeof(UserFilterInputType)), UseSorting(typeof(UsersSorting))]
+    public static async Task<Connection<UserEntity>> GetUsersAsync(
         RealTaskManagerDbContext dbContext,
         PagingArguments args,
         QueryContext<UserEntity>? query = default,

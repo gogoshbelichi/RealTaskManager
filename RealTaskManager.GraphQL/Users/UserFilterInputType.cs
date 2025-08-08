@@ -9,11 +9,12 @@ public sealed class UserFilterInputType : FilterInputType<UserEntity>
     protected override void Configure(IFilterInputTypeDescriptor<UserEntity> descriptor)
     {
         descriptor.BindFieldsExplicitly();
-
+        
         descriptor.Field(u => u.Email);
         descriptor.Field(u => u.Username);
         descriptor.Field(u => u.Roles);
-        descriptor.Field(u => u.TasksAssignedToUser);
+        descriptor.Field(u => u.TasksAssignedToUser)
+            .Type<ListFilterInputType<UsersAssignedToTasksFilterInputType>>();
     }
 }
 
