@@ -47,24 +47,22 @@ public class UserDataLoaders
         PagingArguments args,
         CancellationToken cancellationToken)
     {
-        Console.WriteLine("Dataloader TasksCreatedByUserAsync");
         return await dbContext.Tasks
             .AsNoTracking()
-            .Where(s => userIds.Contains(s.CreatedByUserId) && s.CreatedByUserId != Guid.Empty)
+            .Where(s => userIds.Contains(s.CreatedByUserId))
             .OrderBy(s => s.Id)
             .Select(s => s.CreatedByUserId, selector)
             .ToBatchPageAsync(s => s.CreatedByUserId, args, cancellationToken);
     }
     
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUserAsync(
+    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUsersAsync(
         IReadOnlyList<Guid> userIds,
         RealTaskManagerDbContext dbContext,
         ISelectorBuilder selector,
         PagingArguments args,
         CancellationToken cancellationToken)
     {
-        Console.WriteLine("Dataloader TasksAssignedToUserAsync");
         return await dbContext.TasksAssignedToUsers
             .AsNoTracking()
             .Where(s => userIds.Contains(s.UserId))

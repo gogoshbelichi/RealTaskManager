@@ -33,12 +33,12 @@ public static partial class TaskType
         IUsersAssignedToTasksDataLoader userAssignedToTaskId,
         ISelection selection,
         PagingArguments args,
-        CancellationToken cancellationToken)
+        CancellationToken ct)
     {
         return await userAssignedToTaskId
             .With(args)
             .Select(selection)
-            .LoadAsync(task.Id, cancellationToken)
+            .LoadAsync(task.Id, ct)
             .ToConnectionAsync();
     }
 }

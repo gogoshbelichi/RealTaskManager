@@ -18,12 +18,6 @@ public static partial class UserType
             .ResolveNode(async (ctx, id)
                 => await ctx.DataLoader<IUserByIdDataLoader>()
                     .LoadAsync(id, ctx.RequestAborted));
-        
-        descriptor.Field(u => u.Username);
-        
-        descriptor.Field(u => u.Email);
-
-        descriptor.Field(u => u.Roles);
     }
     
     [UsePaging]
@@ -36,11 +30,11 @@ public static partial class UserType
         PagingArguments args,
         CancellationToken cancellationToken)
     {
-        Console.WriteLine("UserType GetTasksCreatedByUserAsync");
         return await tasksCreatedByUserId
             .With(args)
             .Select(selection)
-            .LoadAsync(userEntity.Id, cancellationToken).ToConnectionAsync();
+            .LoadAsync(userEntity.Id, cancellationToken)
+            .ToConnectionAsync();
     }
     
     [UsePaging]
@@ -49,15 +43,15 @@ public static partial class UserType
     [GraphQLType<ListType<NonNullType<TasksAssignedToUserType>>>]
     public static async Task<Connection<TasksAssignedToUser>> GetTasksAssignedToUserAsync(
         [Parent(requires: nameof(UserEntity.TasksAssignedToUser))] UserEntity user,
-        ITasksAssignedToUserDataLoader loader,
+        ITasksAssignedToUsersDataLoader taskAssignedToUserId,
         ISelection selection,
         PagingArguments args,
         CancellationToken ct)
     {
-        Console.WriteLine("UserType GetTasksAssignedToUserAsync");
-        return await loader
+        return await taskAssignedToUserId
             .With(args)
             .Select(selection)
-            .LoadAsync(user.Id, ct).ToConnectionAsync();
+            .LoadAsync(user.Id, ct)
+            .ToConnectionAsync();
     }
 }
