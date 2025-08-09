@@ -14,7 +14,7 @@ namespace RealTaskManager.GraphQL.Users;
 public static class UserQueries
 {
     //[Authorize("AdminPolicy")]
-    [UsePaging, UseFiltering(typeof(UserFilterInputType)), UseSorting(typeof(UsersSorting))]
+    [UsePaging(IncludeTotalCount = true), UseFiltering(typeof(UserFilterInputType)), UseSorting(typeof(UsersSorting))]
     public static async Task<Connection<UserEntity>> GetUsersAsync(
         RealTaskManagerDbContext dbContext,
         PagingArguments args,

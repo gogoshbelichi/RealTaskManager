@@ -11,7 +11,7 @@ namespace RealTaskManager.GraphQL.Tasks;
 [QueryType]
 public static class TaskQueries
 {
-    [UsePaging, UseFiltering(typeof(TaskFilterInputType)), UseSorting(typeof(TasksSorting))]
+    [UsePaging(IncludeTotalCount = true), UseFiltering(typeof(TaskFilterInputType)), UseSorting(typeof(TasksSorting))]
     public static async Task<Connection<TaskEntity>> GetTasksV2Async(
         RealTaskManagerDbContext dbContext,
         PagingArguments args,
