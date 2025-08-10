@@ -1,5 +1,4 @@
 using GreenDonut.Data;
-using HotChocolate.Execution.Processing;
 using HotChocolate.Types.Pagination;
 using RealTaskManager.Core.Entities;
 using RealTaskManager.GraphQL.AssignedTasks;
@@ -31,13 +30,12 @@ public static partial class TaskType
     public static async Task<Connection<TasksAssignedToUser>> GetUsersAssignedToTasksAsync(
         [Parent(requires: nameof(TaskEntity.TasksAssignedToUser))] TaskEntity task,
         IUsersAssignedToTasksDataLoader userAssignedToTaskId,
-        ISelection selection,
+        QueryContext<TasksAssignedToUser> query,
         PagingArguments args,
         CancellationToken ct)
     {
         return await userAssignedToTaskId
-            .With(args)
-            .Select(selection)
+            .With(args, query)
             .LoadAsync(task.Id, ct)
             .ToConnectionAsync();
     }
