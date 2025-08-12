@@ -3,7 +3,7 @@ using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.GraphQL.Tasks;
 
-public sealed class TasksSorting : SortInputType<TaskEntity> 
+public sealed class TaskSorting : SortInputType<TaskEntity> 
 {
     protected override void Configure(ISortInputTypeDescriptor<TaskEntity> descriptor)
     {

@@ -3,7 +3,7 @@ using RealTaskManager.Core.Entities;
 
 namespace RealTaskManager.GraphQL.Users;
 
-public sealed class UsersSorting : SortInputType<UserEntity> 
+public sealed class UserSorting : SortInputType<UserEntity> 
 {
     protected override void Configure(ISortInputTypeDescriptor<UserEntity> descriptor)
     {
