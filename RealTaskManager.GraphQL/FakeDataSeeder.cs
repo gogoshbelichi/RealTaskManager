@@ -95,7 +95,8 @@ public static class FakeDataSeeder
                 assignPairs.Add(new TasksAssignedToUser
                 {
                     TaskId = task.Id,
-                    UserId = assignedUser.Id
+                    UserId = assignedUser.Id,
+                    LastAssignedAt = DateTimeOffset.UtcNow
                 });
             }
         }
