@@ -23,8 +23,8 @@ public record TakeTaskInput([property: ID<TaskEntity>] Guid Id );
 
 public record UpdateTaskAssignmentInput(
     [property: ID<TaskEntity>] Guid TaskId,
-    [property: ID<UserEntity>] Guid[] AssignToUserIds,
-    [property: ID<UserEntity>] Guid[] RemoveAssignmentToUserIds
+    [property: ID<UserEntity>] Guid[] AssignByUserIds,
+    [property: ID<UserEntity>] Guid[] UserIdsToRemove
 );
 
 public record DeleteTaskInput([property: ID<TaskEntity>] Guid Id);
