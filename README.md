@@ -37,7 +37,7 @@ Administrator – can create, edit, and delete any tasks, and can also assign a 
 To store data, use PostgreSQL ✅
 
 ## Results: 
-I've made several versions and sandboxes during GraphQL and Hot Chocolate research. One with IdentityServer, one with Firebase Auth. And this custom is final.
+I've made several versions and sandboxes during GraphQL and Hot Chocolate research. One with IdentityServer, one with Firebase Auth. And this customization is final.
 
 ## Some examples of queries and mutations
 ```graphql
