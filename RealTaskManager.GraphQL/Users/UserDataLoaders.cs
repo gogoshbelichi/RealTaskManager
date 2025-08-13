@@ -1,6 +1,7 @@
 using GreenDonut.Data;
 using Microsoft.EntityFrameworkCore;
 using RealTaskManager.Core.Entities;
+using RealTaskManager.GraphQL.AssignedTasks;
 using RealTaskManager.Infrastructure.Data;
 
 namespace RealTaskManager.GraphQL.Users;
@@ -59,15 +60,14 @@ public class UserDataLoaders
     public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUsersAsync(
         IReadOnlyList<Guid> userIds,
         RealTaskManagerDbContext dbContext,
-        ISelectorBuilder selector,
+        QueryContext<TasksAssignedToUser> query,
         PagingArguments args,
         CancellationToken cancellationToken)
     {
         return await dbContext.TasksAssignedToUsers
             .AsNoTracking()
             .Where(s => userIds.Contains(s.UserId))
-            .OrderBy(s => s.UserId)
-            .Select(ss => ss.UserId, selector)
+            .With(query, AssignedTasksOrdering.UsersAssignedDefaultOrder)
             .ToBatchPageAsync(s => s.UserId, args, cancellationToken);
     }
 }
