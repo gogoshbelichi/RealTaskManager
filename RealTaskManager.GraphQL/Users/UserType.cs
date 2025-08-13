@@ -43,13 +43,12 @@ public static partial class UserType
     public static async Task<Connection<TasksAssignedToUser>> GetTasksAssignedToUserAsync(
         [Parent(requires: nameof(UserEntity.TasksAssignedToUser))] UserEntity user,
         ITasksAssignedToUsersDataLoader taskAssignedToUserId,
-        ISelection selection,
+        QueryContext<TasksAssignedToUser> query,
         PagingArguments args,
         CancellationToken ct)
     {
         return await taskAssignedToUserId
-            .With(args)
-            .Select(selection)
+            .With(args, query)
             .LoadAsync(user.Id, ct)
             .ToConnectionAsync();
     }
