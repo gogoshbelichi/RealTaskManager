@@ -8,8 +8,8 @@ public class UsersAssignedToTaskType : ObjectType<TasksAssignedToUser>
     protected override void Configure(IObjectTypeDescriptor<TasksAssignedToUser> descriptor)
     {
         descriptor.Name("assignedT");
-        //descriptor.Authorize("User", "Administrator");
         descriptor.BindFieldsExplicitly();
+        
         descriptor.Field(s => s.UserId)
             .ID<UserEntity>();
         descriptor.Field(s => s.User);
