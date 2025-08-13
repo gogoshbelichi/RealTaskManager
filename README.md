@@ -40,7 +40,7 @@ To store data, use PostgreSQL ✅
 I've made several versions and sandboxes during GraphQL and Hot Chocolate research. One with IdentityServer, one with Firebase Auth. And this custom is final.
 
 ## Some examples of queries and mutations
-```
+```graphql
 uery Test1 {
   users(first: 10, where: { tasksAssignedToUser: { any: true } }) {
     edges {
