@@ -11,7 +11,6 @@ public static partial class UserType
 { 
     static partial void Configure(IObjectTypeDescriptor<UserEntity> descriptor)
     {
-        //descriptor.Authorize("User", "Administrator");
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)

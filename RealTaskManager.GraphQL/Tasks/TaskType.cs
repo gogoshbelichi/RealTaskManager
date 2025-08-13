@@ -10,7 +10,6 @@ public static partial class TaskType
 {
     static partial void Configure(IObjectTypeDescriptor<TaskEntity> descriptor)
     {
-        //descriptor.Authorize("User", "Administrator");
         descriptor
             .ImplementsNode()
             .IdField(a => a.Id)
