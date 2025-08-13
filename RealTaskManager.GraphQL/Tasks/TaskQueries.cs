@@ -11,7 +11,8 @@ namespace RealTaskManager.GraphQL.Tasks;
 [QueryType]
 public static class TaskQueries
 {
-    [UsePaging(IncludeTotalCount = true), UseFiltering(typeof(TaskFilterInputType)), UseSorting(typeof(TasksSorting))]
+    [Authorize("UserPolicy")]
+    [UsePaging(IncludeTotalCount = true), UseFiltering(typeof(TaskFilterInputType)), UseSorting(typeof(TaskSorting))]
     public static async Task<Connection<TaskEntity>> GetTasksAsync(
         RealTaskManagerDbContext dbContext,
         PagingArguments args,
@@ -21,11 +22,11 @@ public static class TaskQueries
         Console.WriteLine("TaskQueries GetTasksV2");
         return await dbContext.Tasks
             .AsNoTracking()
-            .With(query, TasksOrdering.TasksDefaultOrder)
+            .With(query, TaskOrdering.TasksDefaultOrder)
             .ToPageAsync(args, ct).ToConnectionAsync();
     }
     
-    [Authorize]
+    [Authorize("UserPolicy")]
     [NodeResolver]
     public static async Task<TaskEntity?> GetTaskByIdAsync(
         Guid id,

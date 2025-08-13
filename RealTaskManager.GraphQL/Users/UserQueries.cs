@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using GreenDonut.Data;
+using HotChocolate.Authorization;
 using HotChocolate.Execution.Processing;
 using HotChocolate.Types.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using RealTaskManager.Core.Entities;
-using RealTaskManager.GraphQL.Tasks;
 using RealTaskManager.Infrastructure.Data;
 
 namespace RealTaskManager.GraphQL.Users;
@@ -13,8 +13,8 @@ namespace RealTaskManager.GraphQL.Users;
 [QueryType]
 public static class UserQueries
 {
-    //[Authorize("AdminPolicy")]
-    [UsePaging(IncludeTotalCount = true), UseFiltering(typeof(UserFilterInputType)), UseSorting(typeof(UsersSorting))]
+    [Authorize("AdminPolicy")]
+    [UsePaging(IncludeTotalCount = true), UseFiltering(typeof(UserFilterInputType)), UseSorting(typeof(UserSorting))]
     public static async Task<Connection<UserEntity>> GetUsersAsync(
         RealTaskManagerDbContext dbContext,
         PagingArguments args,
@@ -24,11 +24,11 @@ public static class UserQueries
         Console.WriteLine("UserQueries GetUsersV2");
         return await dbContext.UserProfiles
             .AsNoTracking()
-            .With(query, UsersOrdering.UsersDefaultOrder)
+            .With(query, UserOrdering.UsersDefaultOrder)
             .ToPageAsync(args, ct).ToConnectionAsync();
     }
     
-    //[Authorize("AdminPolicy")]
+    [Authorize("AdminPolicy")]
     [NodeResolver]
     public static async Task<UserEntity?> GetUserByIdAsync(
         Guid id,
@@ -40,7 +40,7 @@ public static class UserQueries
         return await userById.Select(selection).LoadAsync(id, ct);
     }
     
-    //[Authorize("AdminPolicy")]
+    [Authorize("AdminPolicy")]
     [UsePaging]
     public static async Task<Connection<UserEntity>> GetUsersByIdAsync(
         [ID<UserEntity>] Guid[] ids,
@@ -59,15 +59,17 @@ public static class UserQueries
     
     
     [GraphQLDescription("You, your created tasks and tasks you are assigned to")]
-    //[Authorize("UserPolicy")]
+    [Authorize("UserPolicy")]
     public static IQueryable<UserEntity> GetMe(
         ISelection selection,
         RealTaskManagerDbContext dbContext,
-        ClaimsPrincipal? principal)
+        ClaimsPrincipal principal)
     {
         Console.WriteLine("UserQueries GetMe");
-        var username = principal?.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.PreferredUsername)?.Value;
-        if (username is null) throw new UserNotFoundException();
+        var username = principal.Claims
+            .FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.PreferredUsername)?
+            .Value;
+        
         return dbContext.UserProfiles.AsNoTracking().Where(u => u.Username == username)
             .Select(selection);
     }
