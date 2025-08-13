@@ -10,9 +10,8 @@ public sealed class UserEntity
     [MaxLength(32)]
     public string? Username { get; init; }
     public ICollection<string> Roles { get; init; } = [];
-    [MaxLength(36)]
-    public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; init; } = [];
-    public ICollection<TaskEntity> TasksCreated { get; init; } = [];
     
-    //public ICollection<TaskEntity> CreatedTasks { get; init; } = [];
+    public ICollection<TasksAssignedToUser> TasksAssignedToUser { get; set; } = [];
+    public ICollection<TaskEntity> TasksAssignedTo { get; set; } = []; 
+    public ICollection<TaskEntity> TasksCreated { get; init; } = [];
 }
