@@ -1,6 +1,7 @@
 using GreenDonut.Data;
 using Microsoft.EntityFrameworkCore;
 using RealTaskManager.Core.Entities;
+using RealTaskManager.GraphQL.AssignedTasks;
 using RealTaskManager.Infrastructure.Data;
 
 namespace RealTaskManager.GraphQL.Users;
@@ -21,6 +22,23 @@ public class UserDataLoaders
             .Select(a => a.Id, selector)
             .ToDictionaryAsync(a => a.Id, cancellationToken);
     }
+    
+    [DataLoader]
+    public static async Task<Page<UserEntity>> PagedUsersByIdAsync(
+        IReadOnlyList<Guid> ids,
+        RealTaskManagerDbContext dbContext,
+        ISelectorBuilder selector,
+        PagingArguments args,
+        CancellationToken cancellationToken)
+    {
+        Console.WriteLine("Dataloader UserByIdAsync");
+        return await dbContext.UserProfiles
+            .AsNoTracking()
+            .Where(a => ids.Contains(a.Id))
+            .OrderBy(a => a.Id)
+            .Select(a => a.Id, selector)
+            .ToPageAsync(args, cancellationToken);
+    }
 
     [DataLoader]
     public static async Task<IReadOnlyDictionary<Guid, Page<TaskEntity>>> TasksCreatedByUserAsync(
@@ -30,46 +48,26 @@ public class UserDataLoaders
         PagingArguments args,
         CancellationToken cancellationToken)
     {
-        Console.WriteLine("Dataloader TasksCreatedByUserAsync");
         return await dbContext.Tasks
             .AsNoTracking()
-            .Where(s => userIds.Contains(s.CreatedByUserId) && s.CreatedByUserId != Guid.Empty)
+            .Where(s => userIds.Contains(s.CreatedByUserId))
             .OrderBy(s => s.Id)
             .Select(s => s.CreatedByUserId, selector)
             .ToBatchPageAsync(s => s.CreatedByUserId, args, cancellationToken);
     }
-
-    /*[DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUserAsync(
-        IReadOnlyList<Guid> userIds,
-        RealTaskManagerDbContext dbContext,
-        ISelectorBuilder selector,
-        PagingArguments args,
-        CancellationToken ct)
-    {
-        Console.WriteLine("Dataloader TasksAssignedToUserAsync");
-        return await dbContext.TasksAssignedToUsers
-            .AsNoTracking()
-            .Where(s => userIds.Contains(s.UserId) && s.UserId != Guid.Empty)
-            .OrderBy(u => u.UserId)
-            .Select(s => s.UserId, selector)
-            .ToBatchPageAsync(s => s.UserId, args, ct);
-    }*/
     
     [DataLoader]
-    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUserByUserIdAsync(
+    public static async Task<IReadOnlyDictionary<Guid, Page<TasksAssignedToUser>>> TasksAssignedToUsersAsync(
         IReadOnlyList<Guid> userIds,
         RealTaskManagerDbContext dbContext,
-        ISelectorBuilder selector,
+        QueryContext<TasksAssignedToUser> query,
         PagingArguments args,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        Console.WriteLine("Dataloader TasksAssignedToUserByUserIdAsync");
         return await dbContext.TasksAssignedToUsers
             .AsNoTracking()
-            .Where(a => userIds.Contains(a.UserId))
-            .OrderBy(a => a.UserId)
-            .Select(a => a.UserId, selector)
-            .ToBatchPageAsync(a => a.UserId, args, ct);
+            .Where(s => userIds.Contains(s.UserId))
+            .With(query, AssignedTasksOrdering.UsersAssignedDefaultOrder)
+            .ToBatchPageAsync(s => s.UserId, args, cancellationToken);
     }
 }

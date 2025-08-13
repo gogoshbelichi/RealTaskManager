@@ -1,3 +1,3 @@
 namespace RealTaskManager.GraphQL.Tasks;
 
-public sealed record DeleteTaskPayload(string Result);
+public sealed record ResultTaskPayload(string Result);

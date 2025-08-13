@@ -9,20 +9,22 @@ public sealed class UserFilterInputType : FilterInputType<UserEntity>
     protected override void Configure(IFilterInputTypeDescriptor<UserEntity> descriptor)
     {
         descriptor.BindFieldsExplicitly();
-
+        
         descriptor.Field(u => u.Email);
         descriptor.Field(u => u.Username);
         descriptor.Field(u => u.Roles);
+        descriptor.Field(u => u.TasksAssignedToUser)
+            .Type<ListFilterInputType<UsersAssignedToTasksFilterInputType>>();
     }
 }
 
-/*public sealed class UsersCreatedTasksFilterInputType : FilterInputType<TasksCreatedByUser>
+public sealed class UsersAssignedToTasksFilterInputType : FilterInputType<TasksAssignedToUser>
 {
-    protected override void Configure(IFilterInputTypeDescriptor<TasksCreatedByUser> descriptor)
+    protected override void Configure(IFilterInputTypeDescriptor<TasksAssignedToUser> descriptor)
     {
-        descriptor.Name("UsersCreatedTasksFilter");
+        descriptor.Name("UsersAssignedToTasksFilter");
         descriptor.BindFieldsExplicitly();
-
+        
         descriptor.Field(t => t.Task).Type<TaskFilterInputType>();
     }
-}*/
+}
