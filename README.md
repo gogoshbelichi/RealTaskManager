@@ -16,7 +16,7 @@ Query Support (Queries):
 
 Getting a list of tasks (filtered by status and user) ✅
 
-Getting an issue by ID ✅
+Getting an task by ID ✅
 
 Getting a list of users (for the administrator only) ✅
 
