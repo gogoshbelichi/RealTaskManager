@@ -66,64 +66,49 @@ For lists, I added custom pagination, sorting, and filtering mechanisms using:
 
 This allowed proper handling of cursors and enum fields.
 
-Authentication & Authorization
+### Authentication & Authorization
 
-I implemented several approaches:
+I implemented several approaches: 
 
 Custom service — JWT with endpoints.
-
 IdentityServer — moved auth logic into a separate microservice for scalability and flexibility.
-
 Firebase — experimented with authentication in a monolithic architecture.
 
-UserType
+### UserType
 
 Implements Node.
-
 tasksCreated — tasks created by the user, resolved with DataLoader and pagination.
-
 tasksAssigned — tasks assigned to the user, resolved via DataLoader with QueryContext.
 
-TaskType
+### TaskType
 
 Implements Node.
-
 createdBy — linked to UserEntity.
-
 assignedTo — users assigned to a task, resolved with DataLoader and pagination.
 
-Queries
+### Queries
 
 For Users (UserEntity):
 
 GetUsersAsync — paginated user list with filtering and sorting (UserFilterInputType, UserSorting).
-
 GetUserByIdAsync — fetch by ID using NodeResolver and DataLoader (fixing N+1).
-
 GetUsersByIdAsync — batch fetch users by IDs with pagination and DataLoader.
-
 GetMe — get the current user by JWT token, including created and assigned tasks.
 
 For Tasks (TaskEntity):
 
 GetTasksAsync — paginated list of tasks with filtering and sorting (TaskFilterInputType, TaskSorting).
-
 GetTaskByIdAsync — fetch a task by ID via NodeResolver and DataLoader.
-
 GetTasksByIdAsync — batch fetch tasks by IDs.
 
 These queries demonstrate the combined use of UsePaging + UseFiltering + UseSorting with QueryContext and custom ordering, along with practical application of global object identification (NodeResolver) and field-level authorization (AdminPolicy, UserPolicy).
 
-Mutations
+### Mutations
 
 AddTaskAsync — create a new task. Uses DB transaction, with error handling (e.g., TaskNotCreatedError).
-
 UpdateTaskDetailsAsync — update task title, description, or status. Authorization: only task creator or admin can modify.
-
 UpdateTaskAssignment — assign or unassign users to/from a task. Works with transactions, returns errors (e.g., UsersNotAssignedError).
-
 DeleteTaskAsync — delete a task. Permission check: admin or task creator.
-
 TakeTaskAsync — user can "take ownership" of a task. Includes a check that the task is not already assigned.
 
 Mutations are implemented via FieldResult<TSuccess, TError...>, enabling strongly-typed error handling (e.g., TaskNotFoundError, PermissionException) and predictable contracts for clients.
@@ -133,15 +118,12 @@ Mutations are implemented via FieldResult<TSuccess, TError...>, enabling strongl
 TaskDataLoaders:
 
 TaskByIdAsync — fetch tasks by ID.
-
 UsersAssignedToTasksAsync — batch users assigned to tasks, with pagination.
 
 UserDataLoaders:
 
 UserByIdAsync, PagedUsersByIdAsync — fetch users by ID, with batching and pagination.
-
 TasksCreatedByUserAsync — tasks created by a user (batching + pagination).
-
 TasksAssignedToUsersAsync — tasks assigned to a user.
 
 DataLoaders were implemented via GreenDonut, supporting cursor-paginated batching, which enables efficient loading of nested collections.
