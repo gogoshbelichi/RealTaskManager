@@ -72,7 +72,7 @@ I implemented several approaches:
 
 Custom service — JWT with endpoints.
 IdentityServer — moved auth logic into a separate microservice for scalability and flexibility.
-Firebase — experimented with authentication in a monolithic architecture.
+Firebase — experimented with authentication in a monolithic architecture. [Explore my other repository](https://github.com/gogoshbelichi/UserTasks.GraphQL.Firebase)
 
 ### UserType
 
