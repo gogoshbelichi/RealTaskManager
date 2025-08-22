@@ -71,8 +71,8 @@ This allowed proper handling of cursors and enum fields.
 I implemented several approaches: 
 
 Custom service — JWT with endpoints.
-IdentityServer — moved auth logic into a separate microservice for scalability and flexibility.
-Firebase — experimented with authentication in a monolithic architecture. [Explore my other repository](https://github.com/gogoshbelichi/UserTasks.GraphQL.Firebase)
+IdentityServer — moved auth logic into a separate microservice for scalability and flexibility. [With IdentityServer](https://github.com/gogoshbelichi/UserTasks.GraphQL.IdentityServer)
+Firebase — experimented with authentication in a monolithic architecture. [With Firebase](https://github.com/gogoshbelichi/UserTasks.GraphQL.Firebase)
 
 ### UserType
 
