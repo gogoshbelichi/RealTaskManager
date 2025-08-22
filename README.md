@@ -1,63 +1,71 @@
 # TaskManager
-GraphQL task manager with JWT authentication and authorization via ASP.NET Core 9.x, Entity Framework Core 9.x, HotChocolate v15
 
-## Task:
-## Develop GraphQL API for task management with support for authentication and role-based authorization.
+**GraphQL task manager with JWT authentication and authorization via ASP.NET Core 9.x, Entity Framework Core 9.x, HotChocolate v15**
 
-### Requirements:
-### Implement GraphQL API using HotChocolate
+---
+
+## Table of Contents
+- [Task](#task)
+- [Requirements](#requirements)
+- [Results](#results)
+- [Data Models](#data-models)
+- [GraphQL API](#graphql-api)
+- [Authentication & Authorization](#authentication--authorization)
+- [UserType](#usertype)
+- [TaskType](#tasktype)
+- [Queries](#queries)
+- [Mutations](#mutations)
+- [DataLoaders & Node](#dataloaders--node)
+- [Examples of Queries and Mutations](#some-examples-of-queries-and-mutations)
+
+---
+
+## Task
+**Develop GraphQL API for task management with support for authentication and role-based authorization.**
+
+### Requirements
+**Implement GraphQL API using HotChocolate**
+
 Implement the following types:
 
-Task (Id, Title, Description, Status, CreatedAt, CreatedBy) ✅
+- **Task** (Id, Title, Description, Status, CreatedAt, CreatedBy) ✅
+- **User** (Id, Username, Email, Role) ✅
 
-User (Id, Username, Email, Role) ✅
+**Query Support (Queries):**
 
-Query Support (Queries):
+- Getting a list of tasks (filtered by status and user) ✅
+- Getting a task by ID ✅
+- Getting a list of users (for the administrator only) ✅
+- *All queries must support pagination and sorting.* ✅
 
-Getting a list of tasks (filtered by status and user) ✅
+**Mutations Support:**
 
-Getting an task by ID ✅
+- Creating / updating / deleting an issue (only for authorized users) ✅
+- Implement authentication by obtaining a JWT token. ✅
+- Enter two roles. ✅
+  - *User*: Can create and edit their own tasks. ✅
+  - *Administrator*: Can create, edit, and delete any tasks, and can also assign a task to a user. ✅
+- To store data, use **PostgreSQL**. ✅
 
-Getting a list of users (for the administrator only) ✅
+---
 
-All queries must support pagination and sorting. ✅
+## Results
+I've made several versions and sandboxes during GraphQL and Hot Chocolate research. One with *IdentityServer*, one with *Firebase Auth*. And this customization is final.
 
-Mutations Support:
-
-Creating / updating / deleting an issue (only for authorized users) ✅
-
-Implement authentication by obtaining a JWT token. ✅
-
-Enter two roles. ✅
-
-The user can create and edit their own tasks.✅
-
-Administrator – can create, edit, and delete any tasks, and can also assign a task to a user. ✅
-
-To store data, use PostgreSQL ✅
-
-## Results: 
-I've made several versions and sandboxes during GraphQL and Hot Chocolate research. One with IdentityServer, one with Firebase Auth. And this customization is final.
-
-I explored the capabilities of building a GraphQL API with Hot Chocolate, focusing on performance and extensibility.
+I explored the capabilities of building a **GraphQL API** with *Hot Chocolate*, focusing on **performance** and **extensibility**.
 
 ### Data Models
-
 I implemented the following entities:
 
-TaskEntity and UserEntity, related via CreatedBy (one-to-many) and TasksAssignedToUser (many-to-many).
-
-For tracking task statuses, I used TaskStatusEnum, stored in the database as a string via HasConversion.
+- **TaskEntity** and **UserEntity**, related via *CreatedBy* (one-to-many) and *TasksAssignedToUser* (many-to-many).
+- For tracking task statuses, I used **TaskStatusEnum**, stored in the database as a string via `HasConversion`.
 
 ### GraphQL API
+I developed **queries** and **mutations** for managing tasks and users.
 
-I developed queries and mutations for managing tasks and users.
-
-Implemented field-level authorization using policies and roles.
-
-To solve the N+1 problem, I used DataLoader and batching.
-
-For lists, I added custom pagination, sorting, and filtering mechanisms using:
+- Implemented *field-level authorization* using policies and roles.
+- To solve the **N+1 problem**, I used *DataLoader* and *batching*.
+- For lists, I added custom *pagination*, *sorting*, and *filtering* mechanisms using:
 
 ```csharp
 .AddDbContextCursorPagingProvider()
@@ -67,66 +75,60 @@ For lists, I added custom pagination, sorting, and filtering mechanisms using:
 This allowed proper handling of cursors and enum fields.
 
 ### Authentication & Authorization
+I implemented several approaches:
 
-I implemented several approaches: 
-
-Custom service — JWT with endpoints.
-IdentityServer — moved auth logic into a separate microservice for scalability and flexibility. [With IdentityServer](https://github.com/gogoshbelichi/UserTasks.GraphQL.IdentityServer)
-Firebase — experimented with authentication in a monolithic architecture. [With Firebase](https://github.com/gogoshbelichi/UserTasks.GraphQL.Firebase)
+- **Custom service** — JWT with endpoints.
+- **IdentityServer** — moved auth logic into a separate microservice for scalability and flexibility. [With IdentityServer](https://github.com/gogoshbelichi/UserTasks.GraphQL.IdentityServer)
+- **Firebase** — experimented with authentication in a monolithic architecture. [With Firebase](https://github.com/gogoshbelichi/UserTasks.GraphQL.Firebase)
 
 ### UserType
-
-Implements Node.
-tasksCreated — tasks created by the user, resolved with DataLoader and pagination.
-tasksAssigned — tasks assigned to the user, resolved via DataLoader with QueryContext.
+- Implements *Node*.
+- **tasksCreated** — tasks created by the user, resolved with *DataLoader* and *pagination*.
+- **tasksAssigned** — tasks assigned to the user, resolved via *DataLoader* with *QueryContext*.
 
 ### TaskType
-
-Implements Node.
-createdBy — linked to UserEntity.
-assignedTo — users assigned to a task, resolved with DataLoader and pagination.
+- Implements *Node*.
+- **createdBy** — linked to *UserEntity*.
+- **assignedTo** — users assigned to a task, resolved with *DataLoader* and *pagination*.
 
 ### Queries
+**For Users (UserEntity):**
 
-For Users (UserEntity):
+- **GetUsersAsync** — paginated user list with filtering and sorting (*UserFilterInputType*, *UserSorting*).
+- **GetUserByIdAsync** — fetch by ID using *NodeResolver* and *DataLoader* (fixing N+1).
+- **GetUsersByIdAsync** — batch fetch users by IDs with pagination and *DataLoader*.
+- **GetMe** — get the current user by JWT token, including created and assigned tasks.
 
-GetUsersAsync — paginated user list with filtering and sorting (UserFilterInputType, UserSorting).
-GetUserByIdAsync — fetch by ID using NodeResolver and DataLoader (fixing N+1).
-GetUsersByIdAsync — batch fetch users by IDs with pagination and DataLoader.
-GetMe — get the current user by JWT token, including created and assigned tasks.
+**For Tasks (TaskEntity):**
 
-For Tasks (TaskEntity):
+- **GetTasksAsync** — paginated list of tasks with filtering and sorting (*TaskFilterInputType*, *TaskSorting*).
+- **GetTaskByIdAsync** — fetch a task by ID via *NodeResolver* and *DataLoader*.
+- **GetTasksByIdAsync** — batch fetch tasks by IDs.
 
-GetTasksAsync — paginated list of tasks with filtering and sorting (TaskFilterInputType, TaskSorting).
-GetTaskByIdAsync — fetch a task by ID via NodeResolver and DataLoader.
-GetTasksByIdAsync — batch fetch tasks by IDs.
-
-These queries demonstrate the combined use of UsePaging + UseFiltering + UseSorting with QueryContext and custom ordering, along with practical application of global object identification (NodeResolver) and field-level authorization (AdminPolicy, UserPolicy).
+These queries demonstrate the combined use of *UsePaging* + *UseFiltering* + *UseSorting* with *QueryContext* and custom ordering, along with practical application of *global object identification* (*NodeResolver*) and *field-level authorization* (*AdminPolicy*, *UserPolicy*).
 
 ### Mutations
+- **AddTaskAsync** — create a new task. Uses DB transaction, with error handling (e.g., *TaskNotCreatedError*).
+- **UpdateTaskDetailsAsync** — update task title, description, or status. Authorization: only task creator or admin can modify.
+- **UpdateTaskAssignment** — assign or unassign users to/from a task. Works with transactions, returns errors (e.g., *UsersNotAssignedError*).
+- **DeleteTaskAsync** — delete a task. Permission check: admin or task creator.
+- **TakeTaskAsync** — user can "take ownership" of a task. Includes a check that the task is not already assigned.
 
-AddTaskAsync — create a new task. Uses DB transaction, with error handling (e.g., TaskNotCreatedError).
-UpdateTaskDetailsAsync — update task title, description, or status. Authorization: only task creator or admin can modify.
-UpdateTaskAssignment — assign or unassign users to/from a task. Works with transactions, returns errors (e.g., UsersNotAssignedError).
-DeleteTaskAsync — delete a task. Permission check: admin or task creator.
-TakeTaskAsync — user can "take ownership" of a task. Includes a check that the task is not already assigned.
-
-Mutations are implemented via FieldResult<TSuccess, TError...>, enabling strongly-typed error handling (e.g., TaskNotFoundError, PermissionException) and predictable contracts for clients.
+Mutations are implemented via *FieldResult<TSuccess, TError...>*, enabling strongly-typed error handling (e.g., *TaskNotFoundError*, *PermissionException*) and predictable contracts for clients.
 
 ### DataLoaders & Node
+**TaskDataLoaders:**
 
-TaskDataLoaders:
+- **TaskByIdAsync** — fetch tasks by ID.
+- **UsersAssignedToTasksAsync** — batch users assigned to tasks, with pagination.
 
-TaskByIdAsync — fetch tasks by ID.
-UsersAssignedToTasksAsync — batch users assigned to tasks, with pagination.
+**UserDataLoaders:**
 
-UserDataLoaders:
+- **UserByIdAsync**, **PagedUsersByIdAsync** — fetch users by ID, with batching and pagination.
+- **TasksCreatedByUserAsync** — tasks created by a user (batching + pagination).
+- **TasksAssignedToUsersAsync** — tasks assigned to a user.
 
-UserByIdAsync, PagedUsersByIdAsync — fetch users by ID, with batching and pagination.
-TasksCreatedByUserAsync — tasks created by a user (batching + pagination).
-TasksAssignedToUsersAsync — tasks assigned to a user.
-
-DataLoaders were implemented via GreenDonut, supporting cursor-paginated batching, which enables efficient loading of nested collections.
+*DataLoaders* were implemented via *GreenDonut*, supporting cursor-paginated batching, which enables efficient loading of nested collections.
 
 ## Some examples of queries and mutations
 ```graphql
@@ -628,3 +630,5 @@ query Me {
   }
 }
 ```
+
+
