@@ -132,7 +132,10 @@ Mutations are implemented via *FieldResult<TSuccess, TError...>*, enabling stron
 
 ## Some examples of queries and mutations
 ```graphql
-uery Test1 {
+# Получаем список пользователей, у которых есть назначенные задачи.
+# Для каждого пользователя возвращаем: id, роли, 
+# первую созданную задачу и первую назначенную задачу.
+query Test1 {
   users(first: 10, where: { tasksAssignedToUser: { any: true } }) {
     edges {
       node {
@@ -160,6 +163,8 @@ uery Test1 {
   }
 }
 
+# Получаем пользователей по ID (batch-запрос с пагинацией).
+# Для каждого юзера выводим username, первые 2 созданные задачи и список назначенных.
 query Test4 {
   usersById(
     ids: [
@@ -201,36 +206,8 @@ query Test4 {
   }
 }
 
-query Test5 {
-  users(where: { tasksAssignedToUser: { any: true } }, first: 19) {
-    edges {
-      node {
-        username
-        email
-        tasksCreatedlol(first: 1) {
-          edges {
-            node {
-              title
-              status
-            }
-          }
-        }
-        tasksAssigned(first: 1) {
-          edges {
-            node {
-              task {
-                title
-                status
-              }
-              taskId
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
+# Получаем задачи без исполнителей (any: false).
+# Возвращаем ключевые поля, включая автора и его роли.
 query Test6 {
   tasks(
     first: 3
@@ -269,6 +246,7 @@ query Test6 {
   }
 }
 
+# Получаем задачи с назначенными пользователями, отсортированные по статусу (DESC).
 query Test7 {
   tasks(
     order: [{ status: DESC }]
@@ -308,6 +286,8 @@ query Test7 {
   }
 }
 
+# Получаем задачи, где хотя бы один исполнитель завершил её (DONE).
+# Возвращаем детальную инфу о назначенных пользователях.
 query Test8 {
   tasks(
     order: [{ description: ASC }]
@@ -349,6 +329,8 @@ query Test8 {
   }
 }
 
+# Получаем первых 5 пользователей, у которых есть задачи в статусе DONE.
+# Используем сортировку по username и пагинацию.
 query Test2 {
   users(
     order: [{ username: ASC }]
@@ -390,6 +372,7 @@ query Test2 {
   }
 }
 
+# Получаем одного пользователя по ID + его назначенные задачи.
 query Test9 {
   userById(id: "VXNlckVudGl0eToSOJgB+vTEf5oWDtgAs4Ce") {
     username
@@ -408,6 +391,8 @@ query Test9 {
   }
 }
 
+# Создание новой задачи (без исполнителей).
+# Возвращает созданный таск и возможные ошибки.
 mutation CreateTask {
   addTask(input: { title: "Tesr1ts", description: "Teeesr1ts" }) {
     taskEntity {
@@ -430,6 +415,8 @@ mutation CreateTask {
   }
 }
 
+# Удаление задачи по ID.
+# Если задача не найдена — вернется TaskNotFoundError.
 mutation DeleteTask {
   deleteTask(input: { id: "VGFza0VudGl0eTpDpZgBChTufphYlaXkX1OC" }) {
     resultTaskPayload {
@@ -446,6 +433,7 @@ mutation DeleteTask {
   }
 }
 
+# Получение задачи по ID с деталями.
 query TaskById {
   taskById(id: "VGFza0VudGl0eTrloZgBm8orfbudzCkDwKfP") {
     id
@@ -470,6 +458,7 @@ query TaskById {
   }
 }
 
+# Обновление деталей задачи: статус и заголовок.
 mutation UpdateTaskDetails {
   updateTaskDetails(
     detailsInput: {
@@ -497,6 +486,8 @@ mutation UpdateTaskDetails {
   }
 }
 
+# Взятие задачи пользователем (self-assign).
+# Ошибки: задача уже назначена, не найдена, или пользователь не найден.
 mutation TakeTask {
   takeTask(input: { id: "VGFza0VudGl0eTqjn5gBGkficLczxvmERTtY" }) {
     taskEntity {
@@ -531,6 +522,8 @@ mutation TakeTask {
   }
 }
 
+# Массовое обновление назначений задачи.
+# Можно добавить новых исполнителей и убрать старых.
 mutation UpdateTaskAssignment {
   updateTaskAssignment(
     input: {
@@ -539,13 +532,11 @@ mutation UpdateTaskAssignment {
         "VXNlckVudGl0eToSOJgBF+Hwc7dvHAZw7jT/"
         "VXNlckVudGl0eToSOJgB3d0pebMUjndmjSxQ"
         "VXNlckVudGl0eToSOJgBrPirfoWjCp8SsPWx"
-        "VXNlckVudGl0eToSOJgBrPirfoWjCp8SsPWx"
       ]
       userIdsToRemove: [
         "VXNlckVudGl0eToSOJgBSvgmeZn87ON6rnYU"
         "VXNlckVudGl0eToSOJgBlesmcawkrB4B+TzD"
         "VXNlckVudGl0eToSOJgBkOMwc6gzGD/U2GvT"
-        "VXNlckVudGl0eToSOJgBNNOUer08rr286L6i"
       ]
     }
   ) {
@@ -582,6 +573,7 @@ mutation UpdateTaskAssignment {
   }
 }
 
+# Получение всех задач, созданных пользователем с username = "Mertie93".
 query Test10 {
   tasks(where: { createdBy: { username: { eq: "Mertie93" } } }) {
     edges {
@@ -602,6 +594,8 @@ query Test10 {
   }
 }
 
+# Запрос текущего пользователя (me).
+# Возвращает последние назначенные и первые созданные задачи.
 query Me {
   me {
     id
