@@ -20,7 +20,9 @@ public static class AuthEndpoints
             UserManager<TaskManagerUser> userManager,
             CancellationToken ct) =>
         {
-            var user = await userManager.FindByEmailAsync(request.Login) ?? await userManager.FindByNameAsync(request.Login);
+            var user = await userManager.FindByEmailAsync(request.Login) ??
+                       await userManager.FindByNameAsync(request.Login);
+            
             if (user is null) return Results.BadRequest("User not found");
             
             if (!await userManager.CheckPasswordAsync(user, request.Password))
